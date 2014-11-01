@@ -57,12 +57,11 @@ angular.module('myApp.view1', ['ngRoute'])
         }
 
         $scope.isThreadRunning = function(thread, threadIndex, cyclus) {
-            if(threadIndex < 0 ) return true; //Ready
+            if(threadIndex < 0 ) return false; //Ready
 
-            if( !$scope.isThreadRunning($scope.threads[threadIndex-1], threadIndex-1, cyclus) && ( //higher prio Task not running
-                    (cyclus%thread.T)<=thread.T //new Period T
-                    && (cyclus%thread.T)+1<=thread.C //Computation C not elapsed
-                )
+            if(    (cyclus%thread.T)<=thread.T //new Period T
+                && (cyclus%thread.T)+1<=thread.C //Computation C not elapsed
+                && !$scope.isThreadRunning($scope.threads[threadIndex-1], threadIndex-1, cyclus) //higher prio Task not running
             ) return true;
             else return false;
         }
