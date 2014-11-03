@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute'])
+angular.module('myApp.RTS', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view1', {
-    templateUrl: 'view1/view1.html',
-    controller: 'View1Ctrl'
+  $routeProvider.when('/RTS', {
+    templateUrl: 'RTS/RMS.html',
+    controller: 'RMSCtrl'
   });
 }])
 
-.controller('View1Ctrl', ['$scope', '$http', function($scope) {
+.controller('RMSCtrl', ['$scope', '$http', function($scope) {
         $scope.table = 'Process  Period T  Computation Time C\n'+
                         'a  25  3\n'+
                         'b  25  8\n'+
@@ -17,6 +17,7 @@ angular.module('myApp.view1', ['ngRoute'])
                         'd  50  4\n'+
                         'e  100  2';
         $scope.threads = [];
+        $scope.running = {};
 
         $scope.$watch('table', function(newValue, oldValue) {
             $scope.threads = $scope.calculate(newValue);
@@ -33,7 +34,7 @@ angular.module('myApp.view1', ['ngRoute'])
                     re.lastIndex++;
                 }
 
-                data.push({name: m[1], T: m[2], C:m[3], P:1});
+                data.push({name: m[1], T: m[2], C:m[3], P:1, suspended:0});
                 data.sort(function(a,b){return (a.T - b.T)});
 
                 $scope.utilization = 0;
@@ -58,12 +59,33 @@ angular.module('myApp.view1', ['ngRoute'])
 
         $scope.isThreadRunning = function(thread, threadIndex, cyclus) {
             if(threadIndex < 0 ) return false; //Ready
+            var blocked = $scope.isThreadBlocked($scope.threads[threadIndex-1], threadIndex-1, cyclus);
+            var self = (cyclus%thread.T)<=thread.T //new Period T
+                    && (cyclus%thread.T)+1<=thread.C; //Computation C not elapsed
+            if(self && blocked) {
+                thread.suspended++;
+            }else if(!self && !blocked && thread.suspended>0){
+                thread.suspended--;
+                self = true;
+            }
+            if(self && !blocked) {
+                $scope.running[threadIndex] = $scope.running[threadIndex] || [];
+                $scope.running[threadIndex][cyclus] = true;
+                return true;
+            }
+            else{
+                $scope.running[threadIndex] = $scope.running[threadIndex] || [];
+                $scope.running[threadIndex][cyclus] = false;
+                return false;
+            }
+        }
 
-            if(    (cyclus%thread.T)<=thread.T //new Period T
-                && (cyclus%thread.T)+1<=thread.C //Computation C not elapsed
-                && !$scope.isThreadRunning($scope.threads[threadIndex-1], threadIndex-1, cyclus) //higher prio Task not running
-            ) return true;
-            else return false;
+        $scope.isThreadBlocked = function(thread, threadIndex, cyclus) {
+            if(threadIndex < 0 ) return false; //Ready
+            var parent = $scope.isThreadBlocked($scope.threads[threadIndex-1], threadIndex-1, cyclus); //higher prio Task not running
+
+            if($scope.running[threadIndex][cyclus]) return true || parent;
+            else return false || parent;
         }
 
         $scope.getNumber = function(num) {

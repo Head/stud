@@ -1,0 +1,49 @@
+<div class="container row">
+    <h1>Guess the artist</h1>
+
+    <div class="col-md-4">
+        <div class="windows8" ng-show="loading">
+            <div class="wBall" id="wBall_1">
+                <div class="wInnerBall">
+                </div>
+            </div>
+            <div class="wBall" id="wBall_2">
+                <div class="wInnerBall">
+                </div>
+            </div>
+            <div class="wBall" id="wBall_3">
+                <div class="wInnerBall">
+                </div>
+            </div>
+            <div class="wBall" id="wBall_4">
+                <div class="wInnerBall">
+                </div>
+            </div>
+            <div class="wBall" id="wBall_5">
+                <div class="wInnerBall">
+                </div>
+            </div>
+        </div>
+
+        <img ng-hide="loading" width="300" class="img-responsive img-rounded" ng-src="{{artist.pic}}"/>
+    </div>
+
+    <div class="col-md-4">
+        <h3>Your answer:</h3>
+        <div class="list-group" ng-hide="correct || loading">
+            <a ng-repeat="answer in answers" class="list-group-item" ng-click="guess(answer)" href="javascript:">{{answer.name | replaceURI}}</a>
+        </div>
+
+        <div ng-show="correct">
+            Correct!
+            <button ng-click="next()"  class="btn btn-success">Next</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        Total points:
+        <h4>{{points}}</h4>
+    </div>
+
+
+</div>
