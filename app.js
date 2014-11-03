@@ -5,7 +5,8 @@ angular.module('myApp', [
   'ngRoute',
   'myApp.RTS',
   'myApp.AAI',
-  'myApp.version'
+  'myApp.version',
+    'ui.bootstrap'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/RTS'});
