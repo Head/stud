@@ -25,7 +25,7 @@ angular.module('myApp.AAI', ['ngRoute'])
         $scope.next = function() {
             var queryArtist = 'SELECT DISTINCT ?subject ?artist ?pic ?name ' +
                 'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
-                '?subject dbpedia-owl:author ?artist . ' +
+                '?subject ?fu ?artist . ' +
                 '?subject foaf:depiction ?pic .' +
                 '?artist dbpprop:name ?name ' +
                 '} ORDER BY ?pic OFFSET '+$scope.round+' LIMIT 1';

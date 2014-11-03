@@ -6,27 +6,24 @@ error_reporting(E_ALL);
 include_once("ARC2/ARC2.php");
 $config = array(
     /* db */
-    'db_name' => 'AII',
-    'db_user' => 'AII',
-    'db_pwd' => 'lab2',
+    'db_name' => 'd01c34a3',
+    'db_user' => 'd01c34a3',
+    'db_pwd' => 'Test11',
     /* store */
     'store_name' => 'arc_tests',
     /* stop after 100 errors */
     'max_errors' => 100,
 );
 /*
+//local query
 $store = ARC2::getStore($config);
 if (!$store->isSetUp()) {
     $store->setUp();
 
     $store->query('LOAD <http://server/AAI/Arts_Ontology.owl>');
 }
-
-if ($errs = $store->getErrors()) {
-    echo "Query errors" ;
-    print_r($errs);
-}
 */
+
 # Remote Store
 $dbpconfig = array(
     "remote_store_endpoint" => "http://dbpedia.org/sparql",
@@ -52,6 +49,11 @@ $query = '
 '.$request->query;
 
 $triples = $store->query($query, 'rows'); /* execute the query */
+
+if ($errs = $store->getErrors()) {
+    echo "Query errors" ;
+    print_r($errs);
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
