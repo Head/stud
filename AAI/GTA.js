@@ -23,12 +23,12 @@ angular.module('myApp.AAI', ['ngRoute'])
 
         // fetch question to answer
         $scope.next = function() {
-            var queryArtist = 'SELECT DISTINCT ?subject ?artist ?pic ?name ' +
-                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
-                '?subject ?fu ?artist . ' +
-                '?subject foaf:depiction ?pic .' +
-                '?artist dbpprop:name ?name ' +
-                '} ORDER BY ?pic OFFSET '+$scope.round+' LIMIT 1';
+        var queryArtist = 'SELECT DISTINCT ?subject ?artist ?pic ?name ' +
+            'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
+            '?subject dbpprop:artist ?artist . ' +
+            '?subject foaf:depiction ?pic .' +
+            '?artist rdfs:label ?name ' +
+            '} ORDER BY ?pic OFFSET '+$scope.round+' LIMIT 1';
 
             $scope.round++;
             $scope.correct = false;
@@ -55,18 +55,18 @@ angular.module('myApp.AAI', ['ngRoute'])
                         '<'+$scope.artist.artist + '> dbpedia-owl:birthPlace ?birthplace . ' +
                         '?artist dbpedia-owl:birthPlace ?birthplace . ' +
                         '?artist dbpedia-owl:movement ?movement . ' +
-                        '?artist dbpprop:name ?name ' +
+                        '?artist rdfs:label ?name ' +
                         'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
                         '} UNION { ' +
                         '<'+$scope.artist.artist + '> dbpedia-owl:movement ?movement . ' +
                         '?artist dbpedia-owl:movement ?movement . ' +
-                        '?artist dbpprop:name ?name ' +
+                        '?artist rdfs:label ?name ' +
                         'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
                         '} UNION { ' +
                         '<'+$scope.artist.artist + '> dbpprop:birthPlace ?birthplace . ' +
                         '?artist dbpprop:birthPlace ?birthplace . ' +
                         '?artist dbpedia-owl:movement ?movement . ' +
-                        '?artist dbpprop:name ?name ' +
+                        '?artist rdfs:label ?name ' +
                         '} } ';
 
 
