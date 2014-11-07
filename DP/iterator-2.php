@@ -42,25 +42,31 @@ class ArithmeticComposite extends ArithmeticComponent {
     public function getRight(){
         return $this->right;
     }
+    public function isLeaf() {
+        return false;
+    }
 }
 
 class NumberLeaf extends ArithmeticComponent {
     public function __construct($num) {
         $this->setValue($num);
     }
+    public function isLeaf() {
+        return true;
+    }
 }
 
 class AritheticIterator {
     public function PrintTraverse(ArithmeticComponent $component) {
         $return = '';
-        if(get_class($component) != 'NumberLeaf') {
+        if(!$component->isLeaf()) {
             $return .= '(';
             $return .= $this->PrintTraverse($component->getLeft());
         }
 
         $return .= ' '.$component->getValue().' ';
 
-        if(get_class($component) != 'NumberLeaf') {
+        if(!$component->isLeaf()) {
             $return .= $this->PrintTraverse($component->getRight());
             $return .= ')';
         }
@@ -68,7 +74,7 @@ class AritheticIterator {
     }
 
     public function EvaluateTraverse(ArithmeticComponent $component) {
-        if(get_class($component) != 'NumberLeaf') {
+        if(!$component->isLeaf()) {
             switch($component->getValue()) {
                 case '+':
                     $return = $this->EvaluateTraverse($component->getLeft()) + $this->EvaluateTraverse($component->getRight());
