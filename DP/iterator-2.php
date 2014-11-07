@@ -16,7 +16,7 @@
  *  an Internal Iterator.
  */
 
-class ArithmeticComponent {
+abstract class ArithmeticComponent {
     private $val;
 
     public function getValue() {
@@ -25,6 +25,7 @@ class ArithmeticComponent {
     public function setValue($val) {
         $this->val = $val;
     }
+    public abstract function isLeaf();
 }
 
 class ArithmeticComposite extends ArithmeticComponent {
