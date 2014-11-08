@@ -3,7 +3,9 @@ $postdata = file_get_contents("php://input");
 $request = json_decode($postdata);
 
 error_reporting(E_ALL);
-include_once("ARC2/ARC2.php");
+//include_once("ARC2/ARC2.php");
+include_once("arc2-sparql11/ARC2.php");
+
 $config = array(
     /* db */
     'db_name' => 'AII',
@@ -28,7 +30,8 @@ if (!$store->isSetUp()) {
 $dbpconfig = array(
     "remote_store_endpoint" => "http://87.106.81.97:3030/ds/query",
 );
-$store = ARC2::getRemoteStore($dbpconfig);
+$store = ARC2::getComponent('SPARQL11RemoteStore', $dbpconfig);
+//$store = ARC2::getRemoteStore($dbpconfig);
 
 
 if ($errs = $store->getErrors()) {
