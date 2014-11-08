@@ -47,9 +47,10 @@ angular.module('myApp.AAI', ['ngRoute'])
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
             $scope.paintingPoolIndex = Math.floor(Math.random() * $scope.paintingPool.length);
-            //console.debug("------------------------- NEXT PAINTING:");
-            //console.debug($scope.paintingPool);
-            //console.debug("Painting Pool Index: " + $scope.paintingPoolIndex);
+            console.debug("------------------------- NEXT PAINTING:");
+            console.debug("Pool with "+$scope.paintingPool.length+ " Elements:")
+            console.debug($scope.paintingPool);
+            console.debug("Painting Pool Index: " + $scope.paintingPoolIndex);
 
             // query for selecting paintings randomly
             // with the query a stack of 50 paintings is fetched
@@ -86,11 +87,11 @@ angular.module('myApp.AAI', ['ngRoute'])
             while(!imageExists($scope.artist.pic)) {
                 // if the image is not loading the picture will be removed from the stack
                 // the next artist and painting gets loaded
-                data.splice(0,1);
+                data.shift();
                 $scope.artist = data[0];
                 // the new painting must also be removed from the pool
                 $scope.paintingPool.splice($scope.paintingPoolIndex,1);
-                //console.debug("no image 404 - choose next of 20 stack");
+                console.debug("no image 404 - choose next of 20 stack");
             }
 
             // Fetch false answers for the given artist and painting
