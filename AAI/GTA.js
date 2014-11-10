@@ -163,6 +163,14 @@ angular.module('myApp.AAI', ['ngRoute'])
 
         }
 
+
+		$scope.search = function() {
+			$http.post('AAI/query_index.php', {query: $scope.searchPhrase}).
+                success(function (data, status, headers, config) {
+                    $scope.searchResult = data;
+                });
+		}
+		
     }]);
 
 
