@@ -1,5 +1,5 @@
 <?php
-	include_once("ARC2/ARC2.php");
+	include_once("../ARC2/ARC2.php");
 	require_once 'Zend/Search/Lucene.php';
 	
 	# Remote Store
