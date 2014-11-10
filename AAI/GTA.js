@@ -156,6 +156,19 @@ angular.module('myApp.AAI', ['ngRoute'])
         }
 
         $scope.jokerArtistsPics = function() {
+            // zeigt fuer die vier moeglichen Kuenstler jeweils ein Bild als zusaetzlichen Hinweis an
+
+            // hole die vier kuenstler-urls aus der $scope.answers
+
+            // hole fuer jeden kuenstler ein bild mit url aus dem endpunkt
+            // - pruefe dabei dass fuer den richtigen kuenstler nicht das derzeitige bild nochmal ausgewaehlt wird
+            // - pruefe dabei mittels imageExists() ob das bild vorhanden ist, ansonsten lade ein neues Bild
+
+            // wenn kein Bild fuer den Kuenstler vorhanden ist -> moegliche Alternative ausdenken
+
+            // ziehe x Punkte von aktuellem Punktestand ab
+
+            // beispiel um bild anzuzeigen
             $scope.answers[0].url = "http://upload.wikimedia.org/wikipedia/commons/a/a6/John_Everett_Millais_The_Black_Brunswicker.jpg";
         }
 
@@ -170,7 +183,7 @@ angular.module('myApp.AAI', ['ngRoute'])
                     $scope.searchResult = data;
                 });
 		}
-		
+
     }]);
 
 
