@@ -31,7 +31,10 @@
     <div class="col-md-4">
         <h3>Your answer:</h3>
         <div class="list-group" ng-hide="correct || loading">
-            <a ng-repeat="answer in answers" class="list-group-item" ng-click="guess(answer)" href="javascript:">{{answer.name | replaceURI}}</a>
+            <div ng-repeat="answer in answers">
+                <a class="list-group-item" ng-click="guess(answer)" href="javascript:">{{answer.name | replaceURI}}</a>
+                <img ng-src="{{answer.url}}" ng-show="answer.url"/>
+            </div>
         </div>
 
         <div ng-show="correct">
@@ -51,6 +54,11 @@
     <div class="col-md-4">
         Total points:
         <h4>{{points}}</h4>
+        Joker:
+        <input type="button" ng-click="joker5050" value="50-50"></input>
+        <input type="button" ng-click="jokerArtistsPics()" value="Bilder zu Antworten"></input>
+        <input type="button" ng-click="jokerSearch" value="Suchfunktion"></input>
+
     </div>
 
 

@@ -13,6 +13,7 @@ Fragen:
     - besteht aktuell aus (Movement + Birthplace)
     - Pool noch nicht groß genug (teilweise nur drei Antworten)
     - in der Humm-Ontologie liefert Movement und Birthplace teilweise noch weniger Resultate als vorher
+- Bildprüfung mit Timeout-Funktion (Darstellung des falschen Bildes)
 - Queries auslagern
 - Konfigurationsparameter auslagern (Anzahl Antworten, Minuspunkte etc.)
 - Bilder laden eventuell nach (zeitweise falsches Bild) - <code>$scope.loading</code>

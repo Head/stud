@@ -83,6 +83,8 @@ angular.module('myApp.AAI', ['ngRoute'])
             // get data of the artist and painting
             $scope.artist = data[0];
 
+            console.debug($scope.artist);
+
             // check if picture is present
             while(!imageExists($scope.artist.pic)) {
                 // if the image is not loading the picture will be removed from the stack
@@ -100,7 +102,6 @@ angular.module('myApp.AAI', ['ngRoute'])
                 'WHERE { {' +
                 '<'+$scope.artist.artist + '> dbpedia-owl:birthPlace ?birthplace . ' +
                 '?artist dbpedia-owl:birthPlace ?birthplace . ' +
-                '?artist dbpedia-owl:movement ?movement . ' +
                 '?artist rdfs:label ?name ' +
                 'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
                 '} UNION { ' +
@@ -109,22 +110,27 @@ angular.module('myApp.AAI', ['ngRoute'])
                 '?artist rdfs:label ?name ' +
                 'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
                 '} UNION { ' +
-                '<'+$scope.artist.artist + '> dbpprop:birthPlace ?birthplace . ' +
-                '?artist dbpprop:birthPlace ?birthplace . ' +
-                '?artist dbpedia-owl:movement ?movement . ' +
+                '<'+$scope.artist.artist + '> dbpedia-owl:influencedBy ?artist .' +
                 '?artist rdfs:label ?name ' +
+                'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
                 '} } ';
-
 
             $http.post('query.php', {query: queryAnswers}).
                 success(function (data, status, headers, config) {
                     $scope.answers[0] = $scope.artist;
                     $scope.answers = $scope.answers.concat(scliceArray(data));
+
                     shuffleArray($scope.answers);
+
+                    // TODO: pruefen ob bestenfalls direk im query auslagern
+                    if ($scope.answers.length != 4) {
+                        console.debug("Not able to found 4 answers; choose next;");
+                        $scope.next();
+                        return;
+                    }
                     $scope.loading = false;
                 });
         }
-
 
         $scope.guess = function(answer) {
             if(answer.artist == $scope.artist.artist) {
@@ -143,6 +149,20 @@ angular.module('myApp.AAI', ['ngRoute'])
             var index = $scope.answers.indexOf(answer)
             $scope.answers.splice(index, 1);
         }
+
+
+        $scope.joker5050 = function() {
+
+        }
+
+        $scope.jokerArtistsPics = function() {
+            $scope.answers[0].url = "http://upload.wikimedia.org/wikipedia/commons/a/a6/John_Everett_Millais_The_Black_Brunswicker.jpg";
+        }
+
+        $scope.jokerSearch = function() {
+
+        }
+
     }]);
 
 
