@@ -46,12 +46,21 @@
             PaintArtist
         </div>
 
+		
+		<div class="row">
+			<input tpye="text" class="form-control" ng-model="searchPhrase"/>
+			<input type="button" class="form-control btn btn-default"  ng-click="search()" value="suchen">
+			<ul>
+				<li ng-repeat="res in searchResult">{{res.name}} - {{res.plabel}}</li>
+			</ul>
+		</div>
+		
     </div>
 
     <div class="col-md-4">
         Total points:
         <h4>{{points}}</h4>
     </div>
-
-
+	
 </div>
+

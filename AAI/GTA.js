@@ -143,6 +143,13 @@ angular.module('myApp.AAI', ['ngRoute'])
             var index = $scope.answers.indexOf(answer)
             $scope.answers.splice(index, 1);
         }
+		$scope.search = function() {
+			$http.post('AAI/query_index.php', {query: $scope.searchPhrase}).
+                success(function (data, status, headers, config) {
+                    $scope.searchResult = data;
+                });
+		}
+		
     }]);
 
 
