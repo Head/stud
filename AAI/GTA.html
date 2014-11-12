@@ -51,8 +51,11 @@
 
 		
 		<div class="row">
-			<input tpye="text" class="form-control" ng-model="searchPhrase"/>
-			<input type="button" class="form-control btn btn-default"  ng-click="search()" value="suchen">
+			<form ng-submit="search()">
+				<input tpye="text" class="form-control" ng-model="searchPhrase"/>
+				<input type="button" class="form-control btn btn-default" ng-click="search()" value="suchen"/>
+			</form>
+			
 			<ul>
 				<li ng-repeat="res in searchResult">{{res.name}} - {{res.plabel}}</li>
 			</ul>
