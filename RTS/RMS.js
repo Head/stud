@@ -10,22 +10,55 @@ angular.module('myApp.RTS', ['ngRoute'])
 }])
 
 .controller('RMSCtrl', ['$scope', '$http', function($scope) {
-        $scope.table = 'Process  Period T  Computation Time C\n'+
-                        'a  25  3\n'+
-                        'b  25  8\n'+
-                        'c  50  5\n'+
-                        'd  50  4\n'+
-                        'e  100  2';
-        $scope.threads = [];
-        $scope.running = [];
+        $scope.table = 'Process Period T Computation Time C Deadline D \n'+
+                        'a 3 1 3\n'+
+                        'b 6 1 6\n'+
+                        'c 5 1 5\n'+
+                        'd 10 2 10 ';
 
         $scope.$watch('table', function(newValue, oldValue) {
-            $scope.threads = $scope.calculate(newValue);
-            $scope.calculateRMSTable();
+            $scope.threadsRMS   = $scope.calculate(newValue, 'RMS');
+            $scope.tableRMS     = $scope.calculateTable($scope.threadsRMS);
+
+            $scope.threadsDMS   = $scope.calculate(newValue, 'DMS');
+            $scope.tableDMS     = $scope.calculateTable($scope.threadsDMS);
+
+            $scope.RTA          = $scope.calculateSimpleRTA($scope.threadsDMS);
         });
 
-        $scope.calculate = function(rawData) {
-            var re = /([a-z]?)\s+([0-9]{1,3})\s+([0-9]{1,3})/gim;
+        $scope.calculateSimpleRTA = function(threads) {
+            $scope.debugSimpleRTA = '';
+            var responseTime = [];
+
+            var threadIndex = 0;
+            threads.forEach(function(thread) {
+                $scope.debugSimpleRTA += "\nR("+thread.name+") = "+ thread.C+ (threadIndex>0?" + ":"");
+                var sum =0;
+                for(var j=threadIndex; j>0 ;j--) {
+                    $scope.debugSimpleRTA += "max( D("+ thread.name+ ")/T("+ threads[j-1].name+ ") ) * C("+ threads[j-1].name+")";
+                    if(j>1) $scope.debugSimpleRTA += " + ";
+                }
+
+                $scope.debugSimpleRTA += "\nR("+thread.name+") = "+ thread.C+ (threadIndex>0?" + ":"");
+                for(var j=threadIndex; j>0 ;j--) {
+                    sum += Math.ceil(thread.D / threads[j].T) * threads[j].C;
+                    $scope.debugSimpleRTA += "\n\t\tmax("+ thread.D+ "/"+ threads[j-1].T+ ") * "+ threads[j-1].C+ "\t= "+ Math.ceil(thread.D / threads[j].T) * threads[j].C;
+                    if(j>1) $scope.debugSimpleRTA += " + ";
+                }
+
+                responseTime[threadIndex] = thread.C + sum;
+                $scope.debugSimpleRTA += "\n\t\t\t\t ---";
+                $scope.debugSimpleRTA += "\n\t\t\t\t= "+ responseTime[threadIndex];
+                $scope.debugSimpleRTA += "\n";
+
+                threadIndex++;
+            });
+
+            return responseTime;
+        }
+
+        $scope.calculate = function(rawData, scheduler) {
+            var re = /([a-z]?)\s+([0-9]{1,3})\s+([0-9]{1,3})\s+([0-9]{1,3})?/gim;
             var str = rawData;
             var m;
             var data = [];
@@ -35,8 +68,28 @@ angular.module('myApp.RTS', ['ngRoute'])
                     re.lastIndex++;
                 }
 
-                data.push({name: m[1], T: m[2], C:m[3], P:1, suspended:0, runcount:0, cycluscount:0});
-                data.sort(function(a,b){return (a.T - b.T)});
+                var D = m[4] || m[2];
+                data.push({name: m[1], T: parseInt(m[2]), C:parseInt(m[3]), D:parseInt(D), P:1, suspended:0, runcount:0, cycluscount:0});
+                if(scheduler=='DMS') {
+                    data.sort(function (a, b) {
+                        return (a.D - b.D)
+                    });
+                }else if(scheduler=='RTA') {
+                    /*
+                    for K=1 to N // for all priorities 1 to N (N = number of tasks)
+                        for Next=K to N
+                            Swap(Set, K, Next); // swap the priorities of K and Next
+                            Ok = RTA(K);
+                            exit when Ok; // exit loop
+                        end for;
+                        exit when not Ok; // no solution found
+                    end for;
+                    */
+                }else{
+                    data.sort(function (a, b) {
+                        return (a.T - b.T)
+                    });
+                }
 
                 $scope.utilization = 0;
                 var priority=1;
@@ -58,14 +111,14 @@ angular.module('myApp.RTS', ['ngRoute'])
             return data;
         }
 
-        $scope.calculateRMSTable = function() {
+        $scope.calculateTable = function(threads) {
+            var table = [];
             var threadIndex = 0;
-            $scope.threads.forEach(function(thread) {
-                thread.D = thread.T;
+            threads.forEach(function(thread) {
                 for(var cyclus=0;cyclus<$scope.LCM;cyclus++) {
-                    $scope.running[threadIndex] = $scope.running[threadIndex] || [];
+                    table[threadIndex] = table[threadIndex] || [];
 
-                    var blocked = $scope.isThreadBlocked($scope.threads[threadIndex-1], threadIndex-1, cyclus);
+                    var blocked = $scope.isThreadBlocked(threads, table, threadIndex-1, cyclus);
                     var self = (cyclus%thread.T)<=thread.T //new Period T
                         && (cyclus%thread.T)+1<=thread.C; //Computation C not elapsed
 
@@ -77,43 +130,45 @@ angular.module('myApp.RTS', ['ngRoute'])
                     }
                     if(self && !blocked) {
                         if(thread.C == 1) {
-                            $scope.running[threadIndex][cyclus] = {running: true, symbol: '<>', class:'startend'};
+                            table[threadIndex][cyclus] = {running: true, symbol: '<>', class:'startend'};
                             thread.cycluscount++;
                         }else if (thread.runcount == 0) {
-                            $scope.running[threadIndex][cyclus] = {running: true, symbol: '<', class:'start'};
+                            table[threadIndex][cyclus] = {running: true, symbol: '<', class:'start'};
                             thread.runcount++;
                             thread.cycluscount++;
                         } else if (thread.runcount == thread.C-1) {
-                            $scope.running[threadIndex][cyclus] = {running: true, symbol: '>', class:'end'};
+                            table[threadIndex][cyclus] = {running: true, symbol: '>', class:'end'};
                             thread.runcount = 0;
                         } else {
-                            $scope.running[threadIndex][cyclus] = {running: true, symbol: thread.runcount+1, class:'running'};
+                            table[threadIndex][cyclus] = {running: true, symbol: thread.runcount+1, class:'running'};
                             thread.runcount++;
                         }
 
-                        var cyclusCount = Math.ceil(cyclus/thread.D);
+                        //var cyclusCount = Math.ceil(cyclus/thread.D);
 
                         if(cyclus>=thread.cycluscount*(thread.D)) {
-                            $scope.running[threadIndex][cyclus].class = $scope.running[threadIndex][cyclus].class+' deadline';
+                            table[threadIndex][cyclus].class = table[threadIndex][cyclus].class+' deadline';
                         }
                     }
                     else{
-                        $scope.running[threadIndex][cyclus] = {running: false, symbol: '', class:''};
+                        table[threadIndex][cyclus] = {running: false, symbol: '', class:''};
                     }
                 };
                 threadIndex++;
             });
+
+            return table;
         }
 
-        $scope.isThreadRunning = function(thread, threadIndex, cyclus) {
-            return $scope.running[threadIndex][cyclus];
+        $scope.isThreadRunning = function(running, thread, threadIndex, cyclus) {
+            return running[threadIndex][cyclus];
         }
 
-        $scope.isThreadBlocked = function(thread, threadIndex, cyclus) {
+        $scope.isThreadBlocked = function(threads, running, threadIndex, cyclus) {
             if(threadIndex < 0 ) return false; //Ready
-            var parent = $scope.isThreadBlocked($scope.threads[threadIndex-1], threadIndex-1, cyclus); //higher prio Task not running
+            var parent = $scope.isThreadBlocked(threads, running, threadIndex-1, cyclus); //higher prio Task not running
 
-            if($scope.running[threadIndex][cyclus].running) return true || parent;
+            if(running[threadIndex][cyclus].running) return true || parent;
             else return false || parent;
         }
 

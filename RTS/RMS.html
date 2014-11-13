@@ -1,42 +1,141 @@
 <div class="container row">
-    <h1>Scheduling simulator</h1>
+    <div class="page-header">
+        <h1>Real Time Systems - Scheduling simulator</h1>
+    </div>
 
     <textarea class="form-control" ng-model="table" rows="10"></textarea>
+    <hr/>
 
-    <h4>Sorted by RMS priority</h4>
-    <table class="table table-bordered">
-        <tr>
-            <th>Thread</th>
-            <th>Period T</th>
-            <th>Deadline D</th>
-            <th>Compution C</th>
-            <th>Priority P</th>
-            <th>Utilization</th>
-        </tr>
-        <tr ng-repeat="thread in threads">
-            <td>{{thread.name}}</td>
-            <td>{{thread.T}}</td>
-            <td>{{thread.D}}</td>
-            <td>{{thread.C}}</td>
-            <td>{{thread.P}}</td>
-            <td>{{thread.utilization*100 | number:0}}%</td>
-        </tr>
-    </table>
-    <label ng-class="{'label-danger': utilization>maxUtilization, 'label-success': utilization<=maxUtilization}">Utilization: {{utilization | number:3}} &#8804; max {{maxUtilization | number:3}}</label>
+    <tabset>
+        <tab heading="Rate Monotonic Scheduling">
+            <h4>Sorted by RMS priority</h4>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Thread</th>
+                    <th>Period T</th>
+                    <th>Deadline D</th>
+                    <th>Compution C</th>
+                    <th>Priority P</th>
+                    <th>Utilization</th>
+                </tr>
+                <tr ng-repeat="thread in threadsRMS">
+                    <td>{{thread.name}}</td>
+                    <td>{{thread.T}}</td>
+                    <td>{{thread.D}}</td>
+                    <td>{{thread.C}}</td>
+                    <td>{{thread.P}}</td>
+                    <td>{{thread.utilization*100 | number:0}}%</td>
+                </tr>
+            </table>
+            <label ng-class="{'label-danger': utilization>maxUtilization, 'label-success': utilization<=maxUtilization}">Utilization: {{utilization | number:3}} &#8804; max {{maxUtilization | number:3}}</label>
 
-    <h4>RMS Table with LCM = {{LCM}}</h4>
-    <table class="table table-bordered">
-        <tr ng-repeat="thread in threads">
-            <td>{{thread.name}}</td>
-            <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="isThreadRunning(thread, $parent.$index, $index).class">
-                <span ng-show="running = isThreadRunning(thread, $parent.$index, $index)">
-                {{running.symbol}}
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td ng-repeat="i in getNumber(LCM) track by $index">{{$index}}</td>
-        </tr>
-    </table>
+            <h4>RMS Table with LCM = {{LCM}}</h4>
+            <table class="table table-bordered">
+                <tr ng-repeat="thread in threadsRMS">
+                    <td>{{thread.name}}</td>
+                    <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="tableRMS[$parent.$index][$index].class">
+                        <span ng-show="thisThread = tableRMS[$parent.$index][$index]">
+                        {{thisThread.symbol}}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td ng-repeat="i in getNumber(LCM) track by $index">{{$index}}</td>
+                </tr>
+            </table>
+            <h5>String for RMS Threads</h5>
+            <span ng-repeat="i in getNumber(LCM) track by $index"><span ng-repeat="thread in threadsRMS" ng-show="thisThread = tableRMS[$index][$parent.$index].running">{{thread.name}}</span></span>
+        </tab>
+
+        <tab heading="Deadline Monotonic Scheduling">
+            <h4>Sorted by DMS priority</h4>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Thread</th>
+                    <th>Period T</th>
+                    <th>Deadline D</th>
+                    <th>Compution C</th>
+                    <th>Priority P</th>
+                    <th>Utilization</th>
+                </tr>
+                <tr ng-repeat="thread in threadsDMS">
+                    <td>{{thread.name}}</td>
+                    <td>{{thread.T}}</td>
+                    <td>{{thread.D}}</td>
+                    <td>{{thread.C}}</td>
+                    <td>{{thread.P}}</td>
+                    <td>{{thread.utilization*100 | number:0}}%</td>
+                </tr>
+            </table>
+            <label ng-class="{'label-danger': utilization>maxUtilization, 'label-success': utilization<=maxUtilization}">Utilization: {{utilization | number:3}} &#8804; max {{maxUtilization | number:3}}</label>
+
+            <h4>DMS Table with LCM = {{LCM}}</h4>
+            <table class="table table-bordered">
+                <tr ng-repeat="thread in threadsDMS">
+                    <td>{{thread.name}}</td>
+                    <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="tableDMS[$parent.$index][$index].class">
+                        <span ng-show="thisThread = tableDMS[$parent.$index][$index]">
+                        {{thisThread.symbol}}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td ng-repeat="i in getNumber(LCM) track by $index">{{$index}}</td>
+                </tr>
+            </table>
+            <h5>String for RMS Threads</h5>
+            <span ng-repeat="i in getNumber(LCM) track by $index"><span ng-repeat="thread in threadsDMS" ng-show="thisThread = tableDMS[$index][$parent.$index].running">{{thread.name}}</span></span>
+        </tab>
+
+        <tab heading="Response-Time-Analysis">
+            <h4>Response-Time-Analysis</h4>
+            <p>
+                <pre>Simplified:
+                {{debugSimpleRTA}}
+                </pre>
+                RTA = {{RTA}}
+            </p>
+
+            <table class="table table-bordered">
+                <tr>
+                    <th>Thread</th>
+                    <th>Period T</th>
+                    <th>Deadline D</th>
+                    <th>Compution C</th>
+                    <th>Priority P</th>
+                    <th>Utilization</th>
+                </tr>
+                <tr ng-repeat="thread in threadsDMS">
+                    <td>{{thread.name}}</td>
+                    <td>{{thread.T}}</td>
+                    <td>{{thread.D}}</td>
+                    <td>{{thread.C}}</td>
+                    <td>{{thread.P}}</td>
+                    <td>{{thread.utilization*100 | number:0}}%</td>
+                </tr>
+            </table>
+            <label ng-class="{'label-danger': utilization>maxUtilization, 'label-success': utilization<=maxUtilization}">Utilization: {{utilization | number:3}} &#8804; max {{maxUtilization | number:3}}</label>
+
+            <h4>DMS Table with LCM = {{LCM}}</h4>
+            <table class="table table-bordered">
+                <tr ng-repeat="thread in threadsDMS">
+                    <td>{{thread.name}}</td>
+                    <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="tableDMS[$parent.$index][$index].class">
+                        <span ng-show="thisThread = tableDMS[$parent.$index][$index]">
+                        {{thisThread.symbol}}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td ng-repeat="i in getNumber(LCM) track by $index">{{$index}}</td>
+                </tr>
+            </table>
+            <h5>String for RMS Threads</h5>
+            <span ng-repeat="i in getNumber(LCM) track by $index"><span ng-repeat="thread in threadsDMS" ng-show="thisThread = tableDMS[$index][$parent.$index].running">{{thread.name}}</span></span>
+        </tab>
+
+    </tabset>
 </div>
