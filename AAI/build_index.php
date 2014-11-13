@@ -1,5 +1,4 @@
 <?php
-
     $path = '/www/htdocs/w0128f89/zf1/library';
     set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
