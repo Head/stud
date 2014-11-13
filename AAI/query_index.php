@@ -11,7 +11,7 @@ $request = json_decode($postdata);
 header('Content-Type: text/json; charset=utf-8');
 
 
-$index = new Zend_Search_Lucene('tmp/arts_arc2_index');
+$index = new Zend_Search_Lucene('../tmp/arts_arc2_index');
 $search = $request->query;
 $hits = $index->find(strtolower($search));
 $json = '[';

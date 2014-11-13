@@ -34,7 +34,7 @@
 		$results = $sparql->query($query);
 		#Zend_Search_Lucene_Search_QueryParser::setDefaultEncoding('utf-8');
 		#Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8_CaseInsensitive());
-		$index = new Zend_Search_Lucene('tmp/arts_index', true);
+		$index = new Zend_Search_Lucene('../tmp/arts_index', true);
 		
 		if (isset($_REQUEST['dump'])) {
 			foreach ($results->getFields() as $field) {
