@@ -58,7 +58,7 @@ angular.module('myApp.RTS', ['ngRoute'])
         }
 
         $scope.calculate = function(rawData, scheduler) {
-            var re = /([a-z]?)\s+([0-9]{1,3})\s+([0-9]{1,3})\s+([0-9]{1,3})?/gim;
+            var re = /([a-z]?)\s+([0-9]{1,3})\s+([0-9]{1,3})\s?([0-9]{1,3})?/gim;
             var str = rawData;
             var m;
             var data = [];
