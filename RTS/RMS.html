@@ -8,6 +8,7 @@
         <tr>
             <th>Thread</th>
             <th>Period T</th>
+            <th>Deadline D</th>
             <th>Compution C</th>
             <th>Priority P</th>
             <th>Utilization</th>
@@ -15,6 +16,7 @@
         <tr ng-repeat="thread in threads">
             <td>{{thread.name}}</td>
             <td>{{thread.T}}</td>
+            <td>{{thread.D}}</td>
             <td>{{thread.C}}</td>
             <td>{{thread.P}}</td>
             <td>{{thread.utilization*100 | number:0}}%</td>
@@ -26,7 +28,11 @@
     <table class="table table-bordered">
         <tr ng-repeat="thread in threads">
             <td>{{thread.name}}</td>
-            <td ng-repeat="i in getNumber(LCM) track by $index"><span ng-show="isThreadRunning(thread, $parent.$index, $index)">X</span></td>
+            <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="isThreadRunning(thread, $parent.$index, $index).class">
+                <span ng-show="running = isThreadRunning(thread, $parent.$index, $index)">
+                {{running.symbol}}
+                </span>
+            </td>
         </tr>
         <tr>
             <td></td>
