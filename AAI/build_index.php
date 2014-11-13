@@ -1,6 +1,10 @@
 <?php
+
+    $path = '/www/htdocs/w0128f89/zf1/library';
+    set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+
 	require_once "EasyRdf.php";
-	require_once '/www/htdocs/w0128f89/zf1/library/Zend/Search/Lucene.php';
+	require_once 'Zend/Search/Lucene.php';
 	
 	$endpoint = 'http://87.106.81.97:3030/ds/query';
 	$sparql = new EasyRdf_Sparql_Client($endpoint);

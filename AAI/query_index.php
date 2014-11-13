@@ -1,11 +1,15 @@
 <?php
 
+$path = '/www/htdocs/w0128f89/zf1/library';
+set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+
+require_once 'Zend/Search/Lucene.php';
+
 $postdata = file_get_contents("php://input");
 $request = json_decode($postdata);
 
 header('Content-Type: text/json; charset=utf-8');
 
-require_once '/www/htdocs/w0128f89/zf1/library/Zend/Search/Lucene.php';
 
 $index = new Zend_Search_Lucene('tmp/arts_arc2_index');
 $search = $request->query;

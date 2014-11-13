@@ -1,6 +1,9 @@
 <?php
+    $path = '/www/htdocs/w0128f89/zf1/library';
+    set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+
 	include_once("../ARC2/ARC2.php");
-	require_once '/www/htdocs/w0128f89/zf1/library/Zend/Search/Lucene.php';
+	require_once 'Zend/Search/Lucene.php';
 	
 	# Remote Store
 	$dbpconfig = array(
