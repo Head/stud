@@ -5,9 +5,9 @@ $request = json_decode($postdata);
 
 header('Content-Type: text/json; charset=utf-8');
 
-require_once 'Zend/Search/Lucene.php';
+require_once '/www/htdocs/w0128f89/zf1/library/Zend/Search/Lucene.php';
 
-$index = new Zend_Search_Lucene('../tmp/arts_arc2_index');
+$index = new Zend_Search_Lucene('tmp/arts_arc2_index');
 $search = $request->query;
 $hits = $index->find(strtolower($search));
 $json = '[';
@@ -27,4 +27,4 @@ $json .= ']';
 $json = preg_replace('#@[a-z]{2}#','', $json);
 $json = preg_replace('#""#','"', $json);
 echo $json;
-?>
+

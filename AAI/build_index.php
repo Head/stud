@@ -1,6 +1,6 @@
 <?php
 	require_once "EasyRdf.php";
-	require_once 'Zend/Search/Lucene.php';
+	require_once '/www/htdocs/w0128f89/zf1/library/Zend/Search/Lucene.php';
 	
 	$endpoint = 'http://87.106.81.97:3030/ds/query';
 	$sparql = new EasyRdf_Sparql_Client($endpoint);
@@ -30,7 +30,7 @@
 		$results = $sparql->query($query);
 		#Zend_Search_Lucene_Search_QueryParser::setDefaultEncoding('utf-8');
 		#Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8_CaseInsensitive());
-		$index = new Zend_Search_Lucene('../tmp/arts_index', true);
+		$index = new Zend_Search_Lucene('tmp/arts_index', true);
 		
 		if (isset($_REQUEST['dump'])) {
 			foreach ($results->getFields() as $field) {
