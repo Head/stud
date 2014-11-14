@@ -33,7 +33,7 @@
         <div class="list-group" ng-hide="correct || loading">
             <div ng-repeat="answer in answers">
                 <a class="list-group-item" ng-click="guess(answer)" href="javascript:">{{answer.name | replaceURI}}</a>
-                <img ng-src="{{answer.url}}" ng-show="answer.url"/>
+                <img ng-src="{{answer.url}}" width="200" ng-show="answer.url"/>
             </div>
         </div>
 
@@ -49,18 +49,18 @@
             PaintArtist
         </div>
 
-		
+
 		<div class="row">
 			<form ng-submit="search()">
 				<input tpye="text" class="form-control" ng-model="searchPhrase"/>
 				<input type="button" class="form-control btn btn-default" ng-click="search()" value="suchen"/>
 			</form>
-			
+
 			<ul>
 				<li ng-repeat="res in searchResult">{{res.name}} - {{res.plabel}}</li>
 			</ul>
 		</div>
-		
+
     </div>
 
     <div class="col-md-4">
@@ -72,6 +72,5 @@
         <input type="button" ng-click="jokerSearch" value="Suchfunktion"></input>
 
     </div>
-	
-</div>
 
+</div>

@@ -47,10 +47,10 @@ angular.module('myApp.AAI', ['ngRoute'])
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
             $scope.paintingPoolIndex = Math.floor(Math.random() * $scope.paintingPool.length);
-            console.debug("------------------------- NEXT PAINTING:");
-            console.debug("Pool with "+$scope.paintingPool.length+ " Elements:")
-            console.debug($scope.paintingPool);
-            console.debug("Painting Pool Index: " + $scope.paintingPoolIndex);
+            //console.debug("------------------------- NEXT PAINTING:");
+            //console.debug("Pool with "+$scope.paintingPool.length+ " Elements:")
+            //console.debug($scope.paintingPool);
+            //console.debug("Painting Pool Index: " + $scope.paintingPoolIndex);
 
             // query for selecting paintings randomly
             // with the query a stack of 50 paintings is fetched
@@ -83,7 +83,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             // get data of the artist and painting
             $scope.artist = data[0];
 
-            console.debug($scope.artist);
+            //console.debug($scope.artist);
 
             // check if picture is present
             while(!imageExists($scope.artist.pic)) {
@@ -157,19 +157,64 @@ angular.module('myApp.AAI', ['ngRoute'])
 
         $scope.jokerArtistsPics = function() {
             // zeigt fuer die vier moeglichen Kuenstler jeweils ein Bild als zusaetzlichen Hinweis an
+            console.debug($scope.answers[0]);
+            console.debug($scope.answers[1]);
+            console.debug($scope.answers[2]);
+            console.debug($scope.answers[3]);
 
-            // hole die vier kuenstler-urls aus der $scope.answers
+            var queryArtistPic;
 
-            // hole fuer jeden kuenstler ein bild mit url aus dem endpunkt
-            // - pruefe dabei dass fuer den richtigen kuenstler nicht das derzeitige bild nochmal ausgewaehlt wird
-            // - pruefe dabei mittels imageExists() ob das bild vorhanden ist, ansonsten lade ein neues Bild
-
-            // wenn kein Bild fuer den Kuenstler vorhanden ist -> moegliche Alternative ausdenken
-
+            // TODO:
+            // Bild prüfen
+            //      -> Bilder 404 image exit um timeout erweitern
+            //      -> Bilder 404 einbinden
+            //          -> wenn fail -> nächstes Bild
+            // Bilder random nicht immer das erste Bild
+            // Nicht das aktuelle Bild vom richtigen Künslter anzeigen
+            // Was passiert wenn kein Bild vorhanden ist für den Künslter?
+            //      -> Beim Query der Falschantworten evtl berücksichtigen
             // ziehe x Punkte von aktuellem Punktestand ab
+            // Punktesystem anpassen
 
-            // beispiel um bild anzuzeigen
-            $scope.answers[0].url = "http://upload.wikimedia.org/wikipedia/commons/a/a6/John_Everett_Millais_The_Black_Brunswicker.jpg";
+            queryArtistPic = 'SELECT DISTINCT ?pic ' +
+                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
+                '?subject dbpprop:artist <'+$scope.answers[0].artist+'> . ' +
+                '?subject foaf:depiction ?pic .' +
+                '} ORDER BY ?pic ';
+            $http.post('query.php', {query: queryArtistPic}).
+                success(function (data, status, headers, config) {
+                    $scope.answers[0].url = data[0].pic;
+            });
+
+            queryArtistPic = 'SELECT DISTINCT ?pic ' +
+                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
+                '?subject dbpprop:artist <'+$scope.answers[1].artist+'> . ' +
+                '?subject foaf:depiction ?pic .' +
+                '} ORDER BY ?pic ';
+            $http.post('query.php', {query: queryArtistPic}).
+                success(function (data, status, headers, config) {
+                    $scope.answers[1].url = data[0].pic;
+            });
+
+            queryArtistPic = 'SELECT DISTINCT ?pic ' +
+                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
+                '?subject dbpprop:artist <'+$scope.answers[2].artist+'> . ' +
+                '?subject foaf:depiction ?pic .' +
+                '} ORDER BY ?pic ';
+            $http.post('query.php', {query: queryArtistPic}).
+                success(function (data, status, headers, config) {
+                    $scope.answers[2].url = data[0].pic;
+            });
+
+            queryArtistPic = 'SELECT DISTINCT ?pic ' +
+                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
+                '?subject dbpprop:artist <'+$scope.answers[3].artist+'> . ' +
+                '?subject foaf:depiction ?pic .' +
+                '} ORDER BY ?pic ';
+            $http.post('query.php', {query: queryArtistPic}).
+                success(function (data, status, headers, config) {
+                    $scope.answers[3].url = data[0].pic;
+            });
         }
 
         $scope.jokerSearch = function() {
