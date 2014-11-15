@@ -152,70 +152,132 @@ angular.module('myApp.AAI', ['ngRoute'])
 
 
         $scope.joker5050 = function() {
-
+			if($scope.points >= 2){
+				$scope.points -= 2;
+				
+				 var i;
+				 var max = 4;
+				 var prev = -1;
+				 
+				 while(max > 2){
+					i = Math.floor( Math.random() * max);
+					if(prev == i) {
+						continue;
+					}
+					console.debug(i);
+					if($scope.answers[i].artist != $scope.artist.artist){
+						console.debug($scope.answers[i].artist);
+						console.debug($scope.artist.artist);
+						$scope.remove($scope.answers[i]);
+						prev = i;
+						max--;
+					}
+				}
+			}
+			// else -> evtl. Meldung mit fehlender Punktezahl o.ä.
         }
 
         $scope.jokerArtistsPics = function() {
-            // zeigt fuer die vier moeglichen Kuenstler jeweils ein Bild als zusaetzlichen Hinweis an
-            console.debug($scope.answers[0]);
-            console.debug($scope.answers[1]);
-            console.debug($scope.answers[2]);
-            console.debug($scope.answers[3]);
+			if($scope.points >= 2){
+				$scope.points -= 2;
+				
+				// zeigt fuer die vier moeglichen Kuenstler jeweils ein Bild als zusaetzlichen Hinweis an
+				console.debug($scope.answers[0]);
+				console.debug($scope.answers[1]);
+				console.debug($scope.answers[2]);
+				console.debug($scope.answers[3]);
 
-            var queryArtistPic;
+				//var queryArtistPic;
+				//var i;
 
-            // TODO:
-            // Bild prüfen
-            //      -> Bilder 404 image exit um timeout erweitern
-            //      -> Bilder 404 einbinden
-            //          -> wenn fail -> nächstes Bild
-            // Bilder random nicht immer das erste Bild
-            // Nicht das aktuelle Bild vom richtigen Künslter anzeigen
-            // Was passiert wenn kein Bild vorhanden ist für den Künslter?
-            //      -> Beim Query der Falschantworten evtl berücksichtigen
-            // ziehe x Punkte von aktuellem Punktestand ab
-            // Punktesystem anpassen
-
-            queryArtistPic = 'SELECT DISTINCT ?pic ' +
-                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
-                '?subject dbpprop:artist <'+$scope.answers[0].artist+'> . ' +
-                '?subject foaf:depiction ?pic .' +
-                '} ORDER BY ?pic ';
-            $http.post('query.php', {query: queryArtistPic}).
-                success(function (data, status, headers, config) {
-                    $scope.answers[0].url = data[0].pic;
-            });
-
-            queryArtistPic = 'SELECT DISTINCT ?pic ' +
-                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
-                '?subject dbpprop:artist <'+$scope.answers[1].artist+'> . ' +
-                '?subject foaf:depiction ?pic .' +
-                '} ORDER BY ?pic ';
-            $http.post('query.php', {query: queryArtistPic}).
-                success(function (data, status, headers, config) {
-                    $scope.answers[1].url = data[0].pic;
-            });
-
-            queryArtistPic = 'SELECT DISTINCT ?pic ' +
-                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
-                '?subject dbpprop:artist <'+$scope.answers[2].artist+'> . ' +
-                '?subject foaf:depiction ?pic .' +
-                '} ORDER BY ?pic ';
-            $http.post('query.php', {query: queryArtistPic}).
-                success(function (data, status, headers, config) {
-                    $scope.answers[2].url = data[0].pic;
-            });
-
-            queryArtistPic = 'SELECT DISTINCT ?pic ' +
-                'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
-                '?subject dbpprop:artist <'+$scope.answers[3].artist+'> . ' +
-                '?subject foaf:depiction ?pic .' +
-                '} ORDER BY ?pic ';
-            $http.post('query.php', {query: queryArtistPic}).
-                success(function (data, status, headers, config) {
-                    $scope.answers[3].url = data[0].pic;
-            });
+				// TODO:
+				// Bild prüfen
+				//      -> Bilder 404 image exit um timeout erweitern
+				//      -> Bilder 404 einbinden
+				//          -> wenn fail -> nächstes Bild
+				// Bilder random nicht immer das erste Bild
+				// Nicht das aktuelle Bild vom richtigen Künslter anzeigen
+				// Was passiert wenn kein Bild vorhanden ist für den Künslter?
+				//      -> Beim Query der Falschantworten evtl berücksichtigen
+				// ziehe x Punkte von aktuellem Punktestand ab
+				// Punktesystem anpassen
+				
+				selectJokerPics(0);
+				selectJokerPics(1);
+				selectJokerPics(2);
+				selectJokerPics(3);
+				
+				// TODO:
+				// Ich lass deine ursprüngliche Liste mal stehen, denke aber ich hab alles bis auf:
+				// Was passiert wenn kein Bild vorhanden ist für den Künslter?
+				//      -> Beim Query der Falschantworten evtl berücksichtigen
+				// Punktesystem anpassen
+				// +
+				// Öfter Falschantworten ohne Bild (weil z.B. kein Maler sondern Bildhauer o.ä.)
+				// evtl. bei Query der Falschantworten zusätzlich prüfen ob artist von yagoXYZTZSD:Painting.
+			}
+			// else -> evtl. Meldung mit fehlender Punktezahl o.ä.
         }
+		
+		var selectJokerPics = function(i) {
+		
+			var queryArtistPic;
+			
+			console.debug($scope.answers[i].artist);
+			
+			queryArtistPic = 'SELECT DISTINCT ?pic ' +
+				'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
+				'?subject dbpprop:artist <'+$scope.answers[i].artist+'> . ' +
+				'?subject foaf:depiction ?pic .' +
+				'} ORDER BY ?pic ';
+			$http.post('query.php', {query: queryArtistPic}).
+				success(function (data, status, headers, config) {
+					// shuffle array für random Bild
+					data = shuffleArray(data); 
+					var img = 0;
+					var ok = true;
+					
+					console.debug(data.length);
+					
+					if(data.length > 0){
+						
+						// Schauen das das Bild erreichbar ist, wenn nicht nächstes
+						while(!imageExists(data[img].pic)){
+							img++; 
+							if(img >= data.length){
+								ok = false;
+								break;
+							}
+						}
+						
+						// Für den Fall das das ausgewählte Bild das gerade dargestellte vom Künstler ist, nächstes Bild suchen
+						if($scope.answers[i].artist == $scope.artist.artist && data[img].pic == $scope.artist.pic){
+							img++;
+							if(img < data.length){
+								while(!imageExists(data[img].pic)){
+									img++;
+									if(img >= data.length){
+										ok = false;
+										break;
+									}
+								}
+							}else{
+								ok = false;
+							}
+						}
+					}else{
+						ok = false;
+					}
+					
+					// Bild anzeigen
+					if(ok){
+						$scope.answers[i].url = data[img].pic;
+					}else{
+						$scope.answers[i].url = "http://i58.tinypic.com/4tlwlc.png";
+					}
+					console.debug($scope.answers[i].url);
+			});
+		}
 
         $scope.jokerSearch = function() {
 
