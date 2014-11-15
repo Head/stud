@@ -113,6 +113,11 @@ angular.module('myApp.AAI', ['ngRoute'])
                 '<'+$scope.artist.artist + '> dbpedia-owl:influencedBy ?artist .' +
                 '?artist rdfs:label ?name ' +
                 'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
+				'} UNION { ' +
+                '?painting rdf:type yago:Painting103876519 .' +
+                '?painting dbpprop:artist ?artist .' +
+				'?artist rdfs:label ?name ' +
+                'FILTER ( ?artist != <'+ $scope.artist.artist + '> ). ' +
                 '} } ';
 
             $http.post('query.php', {query: queryAnswers}).
