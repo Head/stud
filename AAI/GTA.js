@@ -165,8 +165,9 @@ angular.module('myApp.AAI', ['ngRoute'])
 
 
         $scope.joker5050 = function() {
-			if($scope.points >= 2){
-				$scope.points -= 2;
+            var JOKER_5050_POINTS = 2
+			if($scope.points >= JOKER_5050_POINTS){
+				$scope.points -= JOKER_5050_POINTS;
 
 				 var i;
 				 var max = 4;
@@ -188,14 +189,15 @@ angular.module('myApp.AAI', ['ngRoute'])
 				}
 			}
             else {
-			    // else -> evtl. Meldung mit fehlender Punktezahl o.ä.
-                $scope.message = "Sie besitzen zu wenig Punkte für den 50-50 Joker!"
+                $scope.message = "Sie besitzen nur " + $scope.points + " Punkt(e), benötigen jedoch für den 50-50 Joker mindestens " + JOKER_5050_POINTS + " Punkte!"
+
             }
         }
 
         $scope.jokerArtistsPics = function() {
-			if($scope.points >= 2){
-				$scope.points -= 2;
+            var JOKER_ARTIST_POINTS = 2;
+			if($scope.points >= JOKER_ARTIST_POINTS){
+				$scope.points -= JOKER_ARTIST_POINTS;
 
                 // TODO: eine Antwort könnte schon vorzeitig gewählt worden sein -> keine Answer im Scope
                 $scope.answers[0].url = "http://rpg.drivethrustuff.com/shared_images/ajax-loader.gif";
@@ -221,8 +223,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 				selectJokerPics(3);
 			}
             else {
-			    // else -> evtl. Meldung mit fehlender Punktezahl o.ä.
-                $scope.message = "Sie besitzen zu wenig Punkte für den Bildvergleich!"
+                $scope.message = "Sie besitzen nur" + $scope.points + " Punkte benötigen jedoch " + JOKER_ARTIST_POINTS + " für den Bildvergleich!"
             }
         }
 
