@@ -21,7 +21,7 @@ foreach ($hits as $hit) {
 	$json .= '{ "ID":'.$hit->id.', "score":'.$hit->score.',';
 	foreach ($doc->getFieldNames() as $fieldName) {
 		$field = $doc->getField($fieldName);
-		$json .= '"'.$field->name.'":"'.$field->getUtf8Value().'",';
+		$json .= '"'.$field->name.'":"'.json_encode($field->getUtf8Value()).'",';
 	}
 	$json = rtrim($json, ',');
 	$json .= '},';
