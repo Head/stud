@@ -10,15 +10,13 @@ Fragen:
 
 - Falschantworten Query unschön
     - Random pick aktuell per JS aus gesamten result query
-    - besteht aktuell aus (Movement + Birthplace)
-    - Pool noch nicht groß genug (teilweise nur drei Antworten)
     - in der Humm-Ontologie liefert Movement und Birthplace teilweise noch weniger Resultate als vorher
 - Bildprüfung mit Timeout-Funktion (Darstellung des falschen Bildes)
 - Queries auslagern
 - Konfigurationsparameter auslagern (Anzahl Antworten, Minuspunkte etc.)
-- Bilder laden eventuell nach (zeitweise falsches Bild) - <code>$scope.loading</code>
 - Feature: Mal schauen ob man auf dem FUSEKI auch sowas wie stored-procedures definieren kann (Soundex-Query)
 - Beantworte Fragen nicht löschen sondern farblich markieren
+- Wenn der 50-50 Joker zwei mal hintereinander ausgeführt wird -> nur noch richtiges Ergebnis
 
 ## Zukünftige Feature
 - Wähle Falschartist nicht nach "movement,birthplace,etc. pp.", sondern nach gleich klingenden Namen (Soundex/Levenshtein)
@@ -27,6 +25,9 @@ Fragen:
 - Hinweis-Feature: allgemeine Hinweise zum Künstler
 
 ## Gefixt
+- Bilder laden eventuell nach (zeitweise falsches Bild) - <code>$scope.loading</code> -> GIF als Ladebild
+- Falschantworten aus Movement + Birthplace + influenced by
+- Falschantworten sind auch wirklich Painter
 - in der Humm-Ontologie sind viele Bildquellen falsch -> Bildcheck durchführen
 - Bilder haben immer die gleiche Reihenfolge (random select mit offset/SPARQL und pool/JS)
 - Löschen der Falschantwort

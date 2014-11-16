@@ -1,39 +1,17 @@
 <div class="container row">
     <h1>Guess the artist</h1>
-
     <div class="col-md-4">
-        <div class="windows8" ng-show="loading">
-            <div class="wBall" id="wBall_1">
-                <div class="wInnerBall">
-                </div>
-            </div>
-            <div class="wBall" id="wBall_2">
-                <div class="wInnerBall">
-                </div>
-            </div>
-            <div class="wBall" id="wBall_3">
-                <div class="wInnerBall">
-                </div>
-            </div>
-            <div class="wBall" id="wBall_4">
-                <div class="wInnerBall">
-                </div>
-            </div>
-            <div class="wBall" id="wBall_5">
-                <div class="wInnerBall">
-                </div>
-            </div>
-        </div>
-
-        <img ng-hide="loading" width="300" class="img-responsive img-rounded" ng-src="{{artist.pic}}"/>
+        <img width="300" class="img-responsive img-rounded" ng-src="{{artist.pic}}"/>
     </div>
 
     <div class="col-md-4">
         <h3>Your answer:</h3>
         <div class="list-group" ng-hide="correct || loading">
             <div ng-repeat="answer in answers">
-                <a class="list-group-item" ng-click="guess(answer)" href="javascript:">{{answer.name | replaceURI}}</a>
-                <img ng-src="{{answer.url}}" width="200" ng-show="answer.url"/>
+                <a class="list-group-item" ng-click="guess(answer)" href="javascript:">
+                    {{answer.name | replaceURI}}
+                    <br ng-show="answer.url"/><img ng-src="{{answer.url}}" width="100" ng-show="answer.url"/>
+                </a>
             </div>
         </div>
 
@@ -64,13 +42,12 @@
     </div>
 
     <div class="col-md-4">
-        Total points:
-        <h4>{{points}}</h4>
-        Joker:
+        <h4>Total points:</h4>
+        {{points}}
+        <h4>Joker:</h4>
         <input type="button" ng-click="joker5050()" value="50-50"></input>
         <input type="button" ng-click="jokerArtistsPics()" value="Bilder zu Antworten"></input>
         <input type="button" ng-click="jokerSearch()" value="Suchfunktion"></input>
-
+        <span ng-show="message" style="display:block;background:red;color:#fff;font-weight:bold; padding:5px; border:1px solid #000;"> {{message}} </span>
     </div>
-
 </div>
