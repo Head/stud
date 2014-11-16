@@ -8,7 +8,7 @@
         <h3>Your answer:</h3>
         <div class="list-group" ng-hide="correct || loading">
             <div ng-repeat="answer in answers">
-                <a class="list-group-item" ng-click="guess(answer)" href="javascript:">
+                <a class="list-group-item {{isAnswerEnabled(answer) ? '' : 'disabled'}}"  ng-click="guess(answer)" href="javascript:">
                     {{answer.name | replaceURI}}
                     <br ng-show="answer.url"/><img ng-src="{{answer.url}}" width="100" ng-show="answer.url"/>
                 </a>

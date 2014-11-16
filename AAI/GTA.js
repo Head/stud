@@ -26,6 +26,8 @@ angular.module('myApp.AAI', ['ngRoute'])
         $scope.paintingPool = [];
         $scope.paintingPoolIndex = 0;
 
+        $scope.disabled_answers = [];
+
         // first we count the present paintings
         var queryCountPaintings = 'SELECT (COUNT(?subject) AS ?count) { ?subject rdf:type yago:Painting103876519 }';
         $http.post('query.php', {query: queryCountPaintings}).
@@ -74,6 +76,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             $scope.correct = false;
             $scope.answers = [];
             $scope.artist  = [];
+            $scope.disabled_answers = [];
             //$scope.loading = true;
             $scope.artist.pic = "https://d13yacurqjgara.cloudfront.net/users/121337/screenshots/916951/small-load.gif";
             $http.post('query.php', {query: queryArtist}).success(fetchRandomArtist);
@@ -153,51 +156,66 @@ angular.module('myApp.AAI', ['ngRoute'])
             }else{
                 // dec points and remove wrong answer
                 $scope.points--;
-                $scope.remove(answer);
+                disableAnswer(answer);
             }
         }
-
-        $scope.remove = function(answer) {
-            // remove answer from scope
-            var index = $scope.answers.indexOf(answer)
-            $scope.answers.splice(index, 1);
-        }
-
 
         $scope.joker5050 = function() {
             var JOKER_5050_POINTS = 2
-			if($scope.points >= JOKER_5050_POINTS){
-				$scope.points -= JOKER_5050_POINTS;
+            if($scope.points >= JOKER_5050_POINTS){
+                if ($scope.disabled_answers.length < 2){
 
-				 var i;
-				 var max = 4;
-				 var prev = -1;
+                    $scope.points -= JOKER_5050_POINTS;
 
-				 while(max > 2){
-					i = Math.floor( Math.random() * max);
-					if(prev == i) {
-						continue;
-					}
-					console.debug(i);
-					if($scope.answers[i].artist != $scope.artist.artist){
-						console.debug($scope.answers[i].artist);
-						console.debug($scope.artist.artist);
-						$scope.remove($scope.answers[i]);
-						prev = i;
-						max--;
-					}
-				}
-			}
-            else {
-                $scope.message = "Sie besitzen nur " + $scope.points + " Punkt(e), benötigen jedoch für den 50-50 Joker mindestens " + JOKER_5050_POINTS + " Punkte!"
+                     var i;
+                     var max = 4;
+                     var prev = -1;
 
+                     while(max > 2){
+                        i = Math.floor( Math.random() * max);
+
+                        // Exclude already guessed answers
+                        var isAnswerAlreadyDisabled = ($scope.disabled_answers.indexOf($scope.answers[i])  != -1);
+                        if (isAnswerAlreadyDisabled) {
+                            continue;
+                        }
+
+                        // Exclude first 50-50 answer
+                        if(prev == i) {
+                            continue;
+                        }
+
+
+                        if($scope.answers[i].artist != $scope.artist.artist ){
+                            disableAnswer($scope.answers[i]);
+                            prev = i;
+                            max--;
+                        }
+                    }
+                }else{
+                    $scope.message = "Es sind nicht genug Antworten verfügbar!";
+                }
             }
+            else {
+                $scope.message = "Sie besitzen nur " + $scope.points + " Punkt(e), benötigen jedoch für den 50-50 Joker mindestens " + JOKER_5050_POINTS + " Punkte!";
+            }
+        }
+
+        $scope.isAnswerEnabled = function (answer) {
+            if ($scope.disabled_answers.indexOf(answer) == -1) {
+                return true;
+            }
+            return false;
+        }
+
+        function disableAnswer(answer) {
+            $scope.disabled_answers.push(answer);
         }
 
         $scope.jokerArtistsPics = function() {
             var JOKER_ARTIST_POINTS = 2;
-			if($scope.points >= JOKER_ARTIST_POINTS){
-				$scope.points -= JOKER_ARTIST_POINTS;
+            if($scope.points >= JOKER_ARTIST_POINTS){
+                $scope.points -= JOKER_ARTIST_POINTS;
 
                 // TODO: eine Antwort könnte schon vorzeitig gewählt worden sein -> keine Answer im Scope
                 $scope.answers[0].url = "http://rpg.drivethrustuff.com/shared_images/ajax-loader.gif";
@@ -205,23 +223,23 @@ angular.module('myApp.AAI', ['ngRoute'])
                 $scope.answers[2].url = "http://rpg.drivethrustuff.com/shared_images/ajax-loader.gif";
                 $scope.answers[3].url = "http://rpg.drivethrustuff.com/shared_images/ajax-loader.gif";
 
-				// zeigt fuer die vier moeglichen Kuenstler jeweils ein Bild als zusaetzlichen Hinweis an
-				console.debug($scope.answers[0]);
-				console.debug($scope.answers[1]);
-				console.debug($scope.answers[2]);
-				console.debug($scope.answers[3]);
+                // zeigt fuer die vier moeglichen Kuenstler jeweils ein Bild als zusaetzlichen Hinweis an
+                console.debug($scope.answers[0]);
+                console.debug($scope.answers[1]);
+                console.debug($scope.answers[2]);
+                console.debug($scope.answers[3]);
 
-				// TODO:
-				// Bild prüfen
-				//      -> Bilder 404 image exit um timeout erweitern
-				// Punktesystem anpassen
+                // TODO:
+                // Bild prüfen
+                //      -> Bilder 404 image exit um timeout erweitern
+                // Punktesystem anpassen
 
                 // TODO: eine Antwort könnte schon vorzeitig gewählt worden sein -> keine Answer im Scope
-				selectJokerPics(0);
-				selectJokerPics(1);
-				selectJokerPics(2);
-				selectJokerPics(3);
-			}
+                selectJokerPics(0);
+                selectJokerPics(1);
+                selectJokerPics(2);
+                selectJokerPics(3);
+            }
             else {
                 $scope.message = "Sie besitzen nur" + $scope.points + " Punkte benötigen jedoch " + JOKER_ARTIST_POINTS + " für den Bildvergleich!"
             }
