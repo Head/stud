@@ -45,9 +45,11 @@
         <h4>Total points:</h4>
         {{points}}
         <h4>Joker:</h4>
-        <input type="button" ng-click="joker5050()" value="50-50"></input>
-        <input type="button" ng-click="jokerArtistsPics()" value="Bilder zu Antworten"></input>
-        <input type="button" ng-click="jokerSearch()" value="Suchfunktion"></input>
-        <span ng-show="message" style="display:block;background:red;color:#fff;font-weight:bold; padding:5px; border:1px solid #000;"> {{message}} </span>
+        <div ng-hide="correct || loading">
+            <input type="button" ng-click="joker5050()" value="50-50"></input>
+            <input type="button" ng-click="jokerArtistsPics()" value="Bilder zu Antworten"></input>
+            <input type="button" ng-click="jokerSearch()" value="Suchfunktion"></input>
+            <span ng-show="message" style="display:block;background:red;color:#fff;font-weight:bold; padding:5px; border:1px solid #000;"> {{message}} </span>
+        </div>
     </div>
 </div>

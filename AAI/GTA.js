@@ -19,7 +19,7 @@ angular.module('myApp.AAI', ['ngRoute'])
         // rounds played
         $scope.round = 0;
         // total points of player
-        $scope.points = 0;
+        $scope.points = 50;
 
         // fetch painting count
         $scope.paintingCounter = 0;
@@ -48,7 +48,7 @@ angular.module('myApp.AAI', ['ngRoute'])
         $scope.next = function() {
             $scope.message = "";
 			$scope.showSearch = $scope.SearchLeft ;
-			
+
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
             $scope.paintingPoolIndex = Math.floor(Math.random() * $scope.paintingPool.length);
@@ -311,10 +311,10 @@ angular.module('myApp.AAI', ['ngRoute'])
         $scope.jokerSearch = function() {
 			if($scope.points >= 2){
 				$scope.points -= 2;
-				
+
 				$scope.SearchLeft = true;
 				$scope.showSearch = true;
-                
+
 			}
             else {
 			    // else -> evtl. Meldung mit fehlender Punktezahl o.ä.
