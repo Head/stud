@@ -47,6 +47,7 @@ angular.module('myApp.AAI', ['ngRoute'])
         // fetch list of possible artists and paintings
         $scope.next = function() {
             $scope.message = "";
+			$scope.showSearch = "false";
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
             $scope.paintingPoolIndex = Math.floor(Math.random() * $scope.paintingPool.length);
@@ -307,7 +308,16 @@ angular.module('myApp.AAI', ['ngRoute'])
 		}
 
         $scope.jokerSearch = function() {
-
+			if($scope.points >= 2){
+				$scope.points -= 2;
+				
+				$scope.showSearch = true;
+                
+			}
+            else {
+			    // else -> evtl. Meldung mit fehlender Punktezahl o.ä.
+                $scope.message = "Sie besitzen zu wenig Punkte für die Suche!"
+            }
         }
 
 

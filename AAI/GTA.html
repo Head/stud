@@ -8,7 +8,7 @@
         <h3>Your answer:</h3>
         <div class="list-group" ng-hide="correct || loading">
             <div ng-repeat="answer in answers">
-                <a class="list-group-item {{isAnswerEnabled(answer) ? '' : 'disabled'}}"  ng-click="guess(answer)" href="javascript:">
+                <a class="list-group-item" ng-click="guess(answer)" href="javascript:">
                     {{answer.name | replaceURI}}
                     <br ng-show="answer.url"/><img ng-src="{{answer.url}}" width="100" ng-show="answer.url"/>
                 </a>
@@ -28,8 +28,8 @@
         </div>
 
 
-		<div class="row">
-			<form ng-submit="search()">
+		<div class="row" ng-show="showSearch">
+			<form ng-submit="search()" >
 				<input tpye="text" class="form-control" ng-model="searchPhrase"/>
 				<input type="button" class="form-control btn btn-default" ng-click="search()" value="suchen"/>
 			</form>
