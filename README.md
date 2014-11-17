@@ -15,8 +15,6 @@ Fragen:
 - Queries auslagern
 - Konfigurationsparameter auslagern (Anzahl Antworten, Minuspunkte etc.)
 - Feature: Mal schauen ob man auf dem FUSEKI auch sowas wie stored-procedures definieren kann (Soundex-Query)
-- Beantworte Fragen nicht löschen sondern farblich markieren
-- Wenn der 50-50 Joker zwei mal hintereinander ausgeführt wird -> nur noch richtiges Ergebnis
 
 ## Zukünftige Feature
 - Wähle Falschartist nicht nach "movement,birthplace,etc. pp.", sondern nach gleich klingenden Namen (Soundex/Levenshtein)
@@ -34,3 +32,6 @@ Fragen:
 - Schöne Namen (dadurch Problem Nr. 1)
 - Endpoint Latenz nervt
 - Bug bei manchen Künstlern (scheinbar wenn der Endpoint down ist). Wenn der Endpoint down ist - wo werden die alten Antworten/Fragen zwischengespeichert? (eigener FUSEKI)
+- Ausgewählte Antworten werden nicht gelöscht, sondern ausgegraut
+- der 50-50 Joker kann nur ausgeführt werden, wenn noch mindestens 2 falsche Antworten aktiv sind
+- Die Fehlermeldungen der Joker zeigen die nötigen Punkte an, die nötig sind um die Joker nutzen zu können
