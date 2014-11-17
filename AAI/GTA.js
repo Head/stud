@@ -47,6 +47,8 @@ angular.module('myApp.AAI', ['ngRoute'])
         // fetch list of possible artists and paintings
         $scope.next = function() {
             $scope.message = "";
+			$scope.showSearch = $scope.SearchLeft ;
+			
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
             $scope.paintingPoolIndex = Math.floor(Math.random() * $scope.paintingPool.length);
@@ -310,6 +312,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 			if($scope.points >= 2){
 				$scope.points -= 2;
 				
+				$scope.SearchLeft = true;
 				$scope.showSearch = true;
                 
 			}
@@ -324,7 +327,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 			$http.post('AAI/query_index.php', {query: $scope.searchPhrase}).
                 success(function (data, status, headers, config) {
                     $scope.searchResult = data;
-					$scope.showSearch = "false";
+					$scope.SearchLeft = false;
                 });
 		}
 
