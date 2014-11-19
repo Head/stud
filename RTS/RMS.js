@@ -41,8 +41,8 @@ angular.module('myApp.RTS', ['ngRoute'])
 
                 $scope.debugSimpleRTA += "\nR("+thread.name+") = "+ thread.C+ (threadIndex>0?" + ":"");
                 for(var j=threadIndex; j>0 ;j--) {
-                    sum += Math.ceil(thread.D / threads[j].T) * threads[j].C;
-                    $scope.debugSimpleRTA += "\n\t\tmax("+ thread.D+ "/"+ threads[j-1].T+ ") * "+ threads[j-1].C+ "\t= "+ Math.ceil(thread.D / threads[j].T) * threads[j].C;
+                    sum += Math.ceil(thread.D / threads[j-1].T) * threads[j-1].C;
+                    $scope.debugSimpleRTA += "\n\t\tceil("+ thread.D+ "/"+ threads[j-1].T+ ") * "+ threads[j-1].C+ "\t= "+ Math.ceil(thread.D / threads[j-1].T) * threads[j-1].C;
                     if(j>1) $scope.debugSimpleRTA += " + ";
                 }
 
