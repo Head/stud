@@ -95,6 +95,10 @@ angular.module('myApp.RTS', ['ngRoute'])
                     return (a.D - b.D)
                 });
             }else if(scheduler=='RTA') {
+                //reverted DMS
+                data.sort(function (a, b) {
+                    return (b.D - a.D)
+                });
                 $scope.calculateSimpleRTA(data);
                 $scope.calculateComplexRTA(data);
 
