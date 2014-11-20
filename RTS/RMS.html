@@ -102,7 +102,7 @@
                     <th>RTA simple</th>
                     <th>RTA complex</th>
                 </tr>
-                <tr ng-repeat="thread in threadsDMS">
+                <tr ng-repeat="thread in threadsRTA">
                     <td>{{thread.name}}</td>
                     <td>{{thread.T}}</td>
                     <td>{{thread.D}}</td>
@@ -129,7 +129,7 @@
                 <tr ng-repeat="thread in threadsRTA">
                     <td>{{thread.name}}</td>
                     <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="tableRTA[$parent.$index][$index].class">
-                        <span ng-show="thisThread = tableDMS[$parent.$index][$index]">
+                        <span ng-show="thisThread = tableRTA[$parent.$index][$index]">
                         {{thisThread.symbol}}
                         </span>
                     </td>
