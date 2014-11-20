@@ -105,7 +105,7 @@ angular.module('myApp.RTS', ['ngRoute'])
             else return true;
         }
 
-        $scope.optimalPriorityAssignmen = function(threads) {
+        $scope.optimalPriorityAssignment = function(threads) {
             var N = threads.length;
             for(var K=1; K<N; N++) {
                 for(var Next=K; Next<N; Next++) {
@@ -160,7 +160,7 @@ angular.module('myApp.RTS', ['ngRoute'])
                 $scope.calculateSimpleRTA(data);
                 $scope.calculateComplexRTA(data);
 
-                $scope.optimalPriorityAssignmen(data);
+                $scope.optimalPriorityAssignment(data);
                 data.sort(function (a, b) {
                     return (a.P - b.P)
                 });
