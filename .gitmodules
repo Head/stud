@@ -4,3 +4,6 @@
 [submodule "arc2-sparql11"]
 	path = arc2-sparql11
 	url = https://github.com/stuartraetaylor/arc2-sparql11.git
+[submodule "alchemyapi_php"]
+	path = alchemyapi_php
+	url = git@github.com:Head/alchemyapi_php.git
