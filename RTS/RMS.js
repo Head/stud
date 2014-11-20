@@ -17,13 +17,16 @@ angular.module('myApp.RTS', ['ngRoute'])
                         'd 10 2 10 ';
 
         $scope.$watch('table', function(newValue, oldValue) {
-            $scope.threadsRMS   = $scope.calculate(newValue, 'RMS');
+            var threads = $scope.getThreadsFromRaw(newValue);
+
+            $scope.threadsRMS   = $scope.calculate(threads, 'RMS');
             $scope.tableRMS     = $scope.calculateTable($scope.threadsRMS);
 
-            $scope.threadsDMS   = $scope.calculate(newValue, 'DMS');
+            $scope.threadsDMS   = $scope.calculate(threads, 'DMS');
             $scope.tableDMS     = $scope.calculateTable($scope.threadsDMS);
 
-            $scope.RTA          = $scope.calculateSimpleRTA($scope.threadsDMS);
+            $scope.threadsRTA   = $scope.calculate(threads, 'RTA');
+            $scope.tableRTA     = $scope.calculateTable($scope.threadsRTA);
         });
 
         $scope.calculateSimpleRTA = function(threads) {
@@ -35,7 +38,7 @@ angular.module('myApp.RTS', ['ngRoute'])
                 $scope.debugSimpleRTA += "\nR("+thread.name+") = "+ thread.C+ (threadIndex>0?" + ":"");
                 var sum =0;
                 for(var j=threadIndex; j>0 ;j--) {
-                    $scope.debugSimpleRTA += "max( D("+ thread.name+ ")/T("+ threads[j-1].name+ ") ) * C("+ threads[j-1].name+")";
+                    $scope.debugSimpleRTA += "ceil( D("+ thread.name+ ")/T("+ threads[j-1].name+ ") ) * C("+ threads[j-1].name+")";
                     if(j>1) $scope.debugSimpleRTA += " + ";
                 }
 
@@ -46,7 +49,7 @@ angular.module('myApp.RTS', ['ngRoute'])
                     if(j>1) $scope.debugSimpleRTA += " + ";
                 }
 
-                responseTime[threadIndex] = thread.C + sum;
+                thread.simpleRTA = responseTime[threadIndex] = thread.C + sum;
                 $scope.debugSimpleRTA += "\n\t\t\t\t ---";
                 $scope.debugSimpleRTA += "\n\t\t\t\t= "+ responseTime[threadIndex];
                 $scope.debugSimpleRTA += "\n";
@@ -57,7 +60,72 @@ angular.module('myApp.RTS', ['ngRoute'])
             return responseTime;
         }
 
-        $scope.calculate = function(rawData, scheduler) {
+        $scope.calculateComplexRTA = function(threads) {
+            $scope.debugComplexRTA = '';
+            var responseTime = [];
+
+            var threadIndex = 0;
+            threads.forEach(function(thread) {
+                var old = 0;
+                var i = 0;
+
+                responseTime[threadIndex] = thread.C;
+                do {
+                    old = responseTime[threadIndex];
+                    $scope.debugComplexRTA += "\nR(" + thread.name + ") = " + thread.C + (threadIndex > 0 ? " + " : "");
+                    var sum = 0;
+                    for (var j = threadIndex; j > 0; j--) {
+                        $scope.debugComplexRTA += "ceil( R(" + thread.name + ")/T(" + threads[j - 1].name + ") ) * C(" + threads[j - 1].name + ")";
+                        if (j > 1) $scope.debugComplexRTA += " + ";
+                    }
+
+                    $scope.debugComplexRTA += "\nR(" + thread.name + ") = " + thread.C + (threadIndex > 0 ? " + " : "");
+                    for (var j = threadIndex; j > 0; j--) {
+                        sum += Math.ceil(responseTime[threadIndex] / threads[j - 1].T) * threads[j - 1].C;
+                        $scope.debugComplexRTA += "\n\t\tceil(" + responseTime[threadIndex] + "/" + threads[j - 1].T + ") * " + threads[j - 1].C + "\t= " + Math.ceil(thread.D / threads[j - 1].T) * threads[j - 1].C;
+                        if (j > 1) $scope.debugComplexRTA += " + ";
+                    }
+
+                    thread.complexRTA = responseTime[threadIndex] = thread.C + sum;
+                    $scope.debugComplexRTA += "\n\t\t\t\t ---";
+                    $scope.debugComplexRTA += "\n\t\t\t\t= " + responseTime[threadIndex];
+                    $scope.debugComplexRTA += "\n";
+                    i++;
+                }while(old!=responseTime[threadIndex] && i < $scope.LCM);
+
+                threadIndex++;
+            });
+
+            return responseTime;
+        }
+
+        $scope.isFeasible = function(thread) {
+            console.log('isFeasible', thread.complexRTA, thread.D);
+            if(thread.complexRTA>thread.D) return false;
+            else return true;
+        }
+
+        $scope.optimalPriorityAssignmen = function(threads) {
+            var N = threads.length;
+            for(var K=1; K<N; N++) {
+                for(var Next=K; Next<N; Next++) {
+                    console.log("swap", Next, K);
+                    var tmp = threads[K];
+                    threads[K] = threads[Next];
+                    threads[Next] = tmp;
+
+                    var ok = $scope.isFeasible(threads[K]);
+                    console.log('isFeasible', K, threads[K]);
+                    if(ok) break;
+
+                }
+                if(!ok) console.error('no RTA found');
+                return false;
+            }
+
+        }
+
+        $scope.getThreadsFromRaw = function(rawData) {
             var re = /([a-z]?)\s+([0-9]{1,3})\s+([0-9]{1,3})\s?([0-9]{1,3})?/gim;
             var str = rawData;
             var m;
@@ -69,46 +137,56 @@ angular.module('myApp.RTS', ['ngRoute'])
                 }
 
                 var D = m[4] || m[2];
-                data.push({name: m[1], T: parseInt(m[2]), C:parseInt(m[3]), D:parseInt(D), P:1, suspended:0, runcount:0, cycluscount:0});
-                if(scheduler=='DMS') {
-                    data.sort(function (a, b) {
-                        return (a.D - b.D)
-                    });
-                }else if(scheduler=='RTA') {
-                    /*
-                    for K=1 to N // for all priorities 1 to N (N = number of tasks)
-                        for Next=K to N
-                            Swap(Set, K, Next); // swap the priorities of K and Next
-                            Ok = RTA(K);
-                            exit when Ok; // exit loop
-                        end for;
-                        exit when not Ok; // no solution found
-                    end for;
-                    */
-                }else{
-                    data.sort(function (a, b) {
-                        return (a.T - b.T)
-                    });
-                }
-
-                $scope.utilization = 0;
-                var priority=1;
-                $scope.LCM = Math.abs(data[0].T);
-                data.forEach(function(entry) {
-                    entry.P = priority;
-                    priority++;
-
-                    entry.utilization = entry.C/entry.T;
-                    $scope.utilization += entry.utilization;
-
-                    var b = Math.abs(entry.T), c = $scope.LCM;
-                    while ($scope.LCM && b){ $scope.LCM > b ? $scope.LCM %= b : b %= $scope.LCM; }
-                    $scope.LCM = Math.abs(c*entry.T)/($scope.LCM+b);
+                var priority = 1;
+                data.push({
+                    name: m[1],
+                    T: parseInt(m[2]),
+                    C: parseInt(m[3]),
+                    D: parseInt(D),
+                    P: priority++,
+                    suspended: 0,
+                    runcount: 0,
+                    cycluscount: 0
                 });
-                $scope.maxUtilization = data.length * (Math.pow(2, 1/data.length)-1)
+            }
+            return data;
+        }
+        $scope.calculate = function(data, scheduler) {
+            if(scheduler=='DMS') {
+                data.sort(function (a, b) {
+                    return (a.D - b.D)
+                });
+            }else if(scheduler=='RTA') {
+                $scope.calculateSimpleRTA(data);
+                $scope.calculateComplexRTA(data);
+
+                $scope.optimalPriorityAssignmen(data);
+                data.sort(function (a, b) {
+                    return (a.P - b.P)
+                });
+            }else{
+                data.sort(function (a, b) {
+                    return (a.T - b.T)
+                });
             }
 
-            return data;
+            $scope.utilization = 0;
+            var priority=1;
+            $scope.LCM = Math.abs(data[0].T);
+            data.forEach(function(entry) {
+                entry.P = priority;
+                priority++;
+
+                entry.utilization = entry.C/entry.T;
+                $scope.utilization += entry.utilization;
+
+                var b = Math.abs(entry.T), c = $scope.LCM;
+                while ($scope.LCM && b){ $scope.LCM > b ? $scope.LCM %= b : b %= $scope.LCM; }
+                $scope.LCM = Math.abs(c*entry.T)/($scope.LCM+b);
+            });
+            $scope.maxUtilization = data.length * (Math.pow(2, 1/data.length)-1)
+
+            return data.slice(); //return a copy!
         }
 
         $scope.calculateTable = function(threads) {

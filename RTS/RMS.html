@@ -91,13 +91,6 @@
 
         <tab heading="Response-Time-Analysis">
             <h4>Response-Time-Analysis</h4>
-            <p>
-                <pre>Simplified:
-                {{debugSimpleRTA}}
-                </pre>
-                RTA = {{RTA}}
-            </p>
-
             <table class="table table-bordered">
                 <tr>
                     <th>Thread</th>
@@ -106,6 +99,8 @@
                     <th>Compution C</th>
                     <th>Priority P</th>
                     <th>Utilization</th>
+                    <th>RTA simple</th>
+                    <th>RTA complex</th>
                 </tr>
                 <tr ng-repeat="thread in threadsDMS">
                     <td>{{thread.name}}</td>
@@ -114,15 +109,26 @@
                     <td>{{thread.C}}</td>
                     <td>{{thread.P}}</td>
                     <td>{{thread.utilization*100 | number:0}}%</td>
+                    <td>{{thread.simpleRTA}}</td>
+                    <td>{{thread.complexRTA}}</td>
                 </tr>
             </table>
+            <button class="btn btn-default pull-right" ng-click="isCollapsed = !isCollapsed">Debug</button>
+            <div collapse="isCollapsed">
+                <pre>Simplified:
+                {{debugSimpleRTA}}</pre>
+                <pre>Complex:
+                {{debugComplexRTA}}
+                </pre>
+            </div>
+
             <label ng-class="{'label-danger': utilization>maxUtilization, 'label-success': utilization<=maxUtilization}">Utilization: {{utilization | number:3}} &#8804; max {{maxUtilization | number:3}}</label>
 
-            <h4>DMS Table with LCM = {{LCM}}</h4>
+            <h4>RTA Table with LCM = {{LCM}}</h4>
             <table class="table table-bordered">
-                <tr ng-repeat="thread in threadsDMS">
+                <tr ng-repeat="thread in threadsRTA">
                     <td>{{thread.name}}</td>
-                    <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="tableDMS[$parent.$index][$index].class">
+                    <td ng-repeat="i in getNumber(LCM) track by $index" ng-class="tableRTA[$parent.$index][$index].class">
                         <span ng-show="thisThread = tableDMS[$parent.$index][$index]">
                         {{thisThread.symbol}}
                         </span>
@@ -134,7 +140,7 @@
                 </tr>
             </table>
             <h5>String for RMS Threads</h5>
-            <span ng-repeat="i in getNumber(LCM) track by $index"><span ng-repeat="thread in threadsDMS" ng-show="thisThread = tableDMS[$index][$parent.$index].running">{{thread.name}}</span></span>
+            <span ng-repeat="i in getNumber(LCM) track by $index"><span ng-repeat="thread in threadsRTA" ng-show="thisThread = tableRTA[$index][$parent.$index].running">{{thread.name}}</span></span>
         </tab>
 
     </tabset>
