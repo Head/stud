@@ -62,7 +62,7 @@ class PrintVisitor extends Visitor {
     
     public function visitPlus(PlusComposite $composite) {
         $this->string .= ' + ';
-        if($this->counter==1) {
+        if($this->counter==2) {
             $this->string .= ')';
             $this->counter--;
         }
@@ -70,7 +70,7 @@ class PrintVisitor extends Visitor {
 
     public function visitMinus(MinusComposite $composite) {
         $this->string .= ' - ';
-        if($this->counter==1) {
+        if($this->counter==2) {
             $this->string .= ')';
             $this->counter--;
         }
@@ -78,7 +78,7 @@ class PrintVisitor extends Visitor {
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
         $this->string .= ' * ';
-        if($this->counter==1) {
+        if($this->counter==2) {
             $this->string .= ')';
             $this->counter--;
         }
