@@ -65,7 +65,7 @@ class PrintVisitor extends Visitor {
     }
     
     public function visitPlus(PlusComposite $composite) {
-        
+        echo "in visitPlus ".$this->state."<br>";
         switch($this->state) {
             case 1:
                 $this->string .= '(';
@@ -77,6 +77,7 @@ class PrintVisitor extends Visitor {
                 $this->string .= ')';
                 break;
         }
+        echo "string: ".$this->string."<br>";
     }
 
     public function visitMinus(MinusComposite $composite) {
