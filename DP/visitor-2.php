@@ -93,7 +93,7 @@ class PrintVisitor extends Visitor {
         return $leaf->isLeaf();
     }
     public function getResult() {
-        return $this->string;
+        return $this->string . str_repeat(')', $this->counterRight);;
     }
 }
 
@@ -202,8 +202,8 @@ class inOrderIterator extends AritheticIterator {
     }
     
     public function traverse(ArithmeticComponent $composite) {
-        $this->visitor->addCounter();
         if(!$composite->isLeaf()) {
+            $this->visitor->addCounter();
             $this->traverse($composite->getLeft());
         }
         
@@ -211,6 +211,7 @@ class inOrderIterator extends AritheticIterator {
         
         if(!$composite->isLeaf()) {
             $composite->accept($this->visitor);
+            $this->visitor->addCounter();
             $this->traverse($composite->getRight());
         }
     }
