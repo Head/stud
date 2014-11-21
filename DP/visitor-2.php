@@ -53,46 +53,40 @@ class EvaluateVisitor extends Visitor {
 class PrintVisitor extends Visitor {
     
     private $string;
-    private $counter;
+    private $counterLeft;
+    private $counterRight;
     
     public function __construct() {
         $this->string  = '';
-        $this->counter = 0;
+        $this->counterLeft = 0;
+        $this->counterRight = 0;
+    }
+    public function addCounter() {
+        $this->counterLeft++;
+        $this->counterRight++;
     }
     
     public function visitPlus(PlusComposite $composite) {
-        if($this->counter>=2) {
-            $this->string .= str_repeat(')', $this->counter);
-            $this->counter = 0;
-        }
         $this->string .= ' + ';
-        
-        $this->counter++;
+        $this->counterRight--;
     }
 
     public function visitMinus(MinusComposite $composite) {
-        if($this->counter>=2) {
-            $this->string .= str_repeat(')', $this->counter);
-            $this->counter = 0;
-        }
         $this->string .= ' - ';
-        
-        $this->counter++;
+        $this->counterRight--;
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
-        if($this->counter>=2) {
-            $this->string .= str_repeat(')', $this->counter);
-            $this->counter = 0;
-        }
         $this->string .= ' * ';
-        
-        $this->counter++;
+        $this->counterRight--;
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
-        $this->string .= str_repeat('(', $this->counter);
+        $this->string .= str_repeat(')', $this->counterRight);
+        $this->string .= str_repeat('(', $this->counterLeft);
         $this->string .= $leaf->getValue();
+        $this->counterLeft = 0;
+        $this->counterRight = 0;
         
     }
     public function isLeaf(ArithmeticComponent $leaf) {
@@ -230,6 +224,7 @@ class postOrderIterator extends AritheticIterator {
     }
     
     public function traverse(ArithmeticComponent $composite) {
+        $this->visitor->addCounter();
         if(!$composite->isLeaf()) {
             $this->traverse($composite->getLeft());
             $this->traverse($composite->getRight());
