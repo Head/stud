@@ -147,12 +147,6 @@ class NumberLeaf extends ArithmeticComponent {
 
 
 abstract class AritheticIterator {
-    private $visitor;
-    
-    public function __construct($visitor) {
-        $this->visitor = $visitor;
-    }
-    
     abstract function traverse(ArithmeticComponent $composite);
     
     /*
@@ -184,6 +178,13 @@ abstract class AritheticIterator {
 }
 
 class inOrderIterator extends AritheticIterator {
+    
+    private $visitor;
+    
+    public function __construct($visitor) {
+        $this->visitor = $visitor;
+    }
+    
     public function traverse(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
             $this->traverse($composite->getLeft());
@@ -199,6 +200,13 @@ class inOrderIterator extends AritheticIterator {
 }
 
 class postOrderIterator extends AritheticIterator {
+    
+    private $visitor;
+    
+    public function __construct($visitor) {
+        $this->visitor = $visitor;
+    }
+    
     public function traverse(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
             $this->traverse($composite->getLeft());
