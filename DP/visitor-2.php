@@ -163,6 +163,19 @@ class AritheticIterator {
         }
         $composite->accept($visitor);
     }
+    public function inCalcOrder(ArithmeticComponent $composite, Visitor $visitor) {
+        if(!$composite->isLeaf()) {
+            $this->inOrder($composite->getLeft(), $visitor);
+        }
+        
+        if($composite->isLeaf()) $composite->accept($visitor);
+        
+        if(!$composite->isLeaf()) {
+            $composite->accept($visitor);
+            $this->inOrder($composite->getRight(), $visitor);
+        }
+        return $result;
+    }
     
     public function inOrder(ArithmeticComponent $composite, Visitor $visitor) {
         $result = '';
@@ -202,7 +215,7 @@ function main() {
     $iterator = new AritheticIterator();
     echo $iterator->inOrder($add_brackets, $print);
     
-    echo $iterator->postOrder($add_brackets, $evaluate);
+    echo $iterator->inCalcOrder($add_brackets, $evaluate);
     
     //echo $iterator->traverse($add_brackets->accept($print))." = ",$iterator->traverse($add_brackets->accept($evaluate));
 }
