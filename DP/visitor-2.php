@@ -202,6 +202,7 @@ class inOrderIterator extends AritheticIterator {
     }
     
     public function traverse(ArithmeticComponent $composite) {
+        $this->visitor->addCounter();
         if(!$composite->isLeaf()) {
             $this->traverse($composite->getLeft());
         }
@@ -224,7 +225,6 @@ class postOrderIterator extends AritheticIterator {
     }
     
     public function traverse(ArithmeticComponent $composite) {
-        $this->visitor->addCounter();
         if(!$composite->isLeaf()) {
             $this->traverse($composite->getLeft());
             $this->traverse($composite->getRight());
