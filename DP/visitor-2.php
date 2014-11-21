@@ -128,7 +128,6 @@ class NumberLeaf extends ArithmeticComponent {
 
 
 class AritheticIterator {
-    
     public function postOrder(ArithmeticComponent $composite, Visitor $visitor) {
         if(!$composite->isLeaf()) {
             $this->postOrder($composite->getLeft(), $visitor);
@@ -138,17 +137,20 @@ class AritheticIterator {
     }
     
     public function inOrder(ArithmeticComponent $composite, Visitor $visitor) {
+        $result = '';
         if(!$composite->isLeaf()) {
-            echo $composite->accept($visitor);
-            $this->inOrder($composite->getLeft(), $visitor);
+            $result .= '(';
+            $result .= $this->inOrder($composite->getLeft(), $visitor);
         }
         
-        echo $composite->accept($visitor);
+        $result .= $composite->accept($visitor);
         
         if(!$composite->isLeaf()) {
-            echo $composite->accept($visitor);
-            $this->inOrder($composite->getRight(), $visitor);
+            $result .= $composite->accept($visitor);
+            $result .= $this->inOrder($composite->getRight(), $visitor);
+            $result .= ')';
         }
+        return $result;
     }
 }
 
