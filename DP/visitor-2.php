@@ -15,6 +15,12 @@ abstract class Visitor {
     abstract function visitMultiplicate(MultiplicateComposite $composite);
     abstract function visitLeaf(NumberLeaf $leaf);
     abstract function isLeaf(ArithmeticComponent $leaf);
+    
+    private $state;
+    
+    public function setVisit($state) {
+        $this->state = $state;
+    }
 }
 
 class EvaluateVisitor extends Visitor {
@@ -53,41 +59,66 @@ class EvaluateVisitor extends Visitor {
 class PrintVisitor extends Visitor {
     
     private $string;
-    private $counterLeft;
-    private $counterRight;
     
     public function __construct() {
         $this->string  = '';
-        $this->counterLeft = 0;
-        $this->counterRight = 0;
-    }
-    public function addCounter() {
-        $this->counterLeft++;
-        $this->counterRight++;
     }
     
     public function visitPlus(PlusComposite $composite) {
-        $this->string .= ' + ';
-        $this->counterRight--;
+        
+        switch($this->state) {
+            case 1:
+                $this->string .= '(';
+                break;
+            case 2:
+                $this->string .= ' + ';
+                break;
+            case 3:
+                $this->string .= ')';
+                break;
+        }
     }
 
     public function visitMinus(MinusComposite $composite) {
-        $this->string .= ' - ';
-        $this->counterRight--;
+        switch($this->state) {
+            case 1:
+                $this->string .= '(';
+                break;
+            case 2:
+                $this->string .= ' - ';
+                break;
+            case 3:
+                $this->string .= ')';
+                break;
+        }
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
-        $this->string .= ' * ';
-        $this->counterRight--;
+        switch($this->state) {
+            case 1:
+                $this->string .= '(';
+                break;
+            case 2:
+                $this->string .= ' * ';
+                break;
+            case 3:
+                $this->string .= ')';
+                break;
+        }
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
-        $this->string .= str_repeat(')', $this->counterRight);
-        $this->string .= str_repeat('(', $this->counterLeft);
-        $this->string .= $leaf->getValue();
-        $this->counterLeft = 0;
-        $this->counterRight = 0;
-        
+        switch($this->state) {
+            case 1:
+                $this->string .= '(';
+                break;
+            case 2:
+                $this->string .= $leaf->getValue();
+                break;
+            case 3:
+                $this->string .= ')';
+                break;
+        }
     }
     public function isLeaf(ArithmeticComponent $leaf) {
         return $leaf->isLeaf();
@@ -202,17 +233,19 @@ class inOrderIterator extends AritheticIterator {
     }
     
     public function traverse(ArithmeticComponent $composite) {
-        if(!$composite->isLeaf()) {
-            $this->visitor->addCounter();
+        if($composite->getLeft()) {
+            $this->visitor->setVisit(1);
+            $composite->accept($this->visitor);
             $this->traverse($composite->getLeft());
         }
-        
-        if($composite->isLeaf()) $composite->accept($this->visitor);
-        
-        if(!$composite->isLeaf()) {
+
+        $this->visitor->setVisit(2);
+        $composite->accept($this->visitor);
+
+        if($composite->getRight()) {
             $composite->accept($this->visitor);
-            $this->visitor->addCounter();
             $this->traverse($composite->getRight());
+            $this->visitor->setVisit(3);
         }
     }
 }
