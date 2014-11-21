@@ -19,51 +19,28 @@ abstract class Visitor {
 
 class EvaluateVisitor extends Visitor {
     
-    private $left;
-    private $right;
+    private $stack;
+    
+    public function getResult($param) {
+        return array_pop($stack);
+    }
     
     public function visitPlus(PlusComposite $composite) {
-        if($this->left && $this->right) {
-            echo "calc: ".$this->left.' + '.$this->right."<br/>";
-            $this->left = $this->left + $this->right;
-            $this->right = false;
-        }else{
-            return $this->left;
-        }
+        array_push($stack, array_pop($stack) + array_pop($stack));
     }
 
     public function visitMinus(MinusComposite $composite) {
-        if($this->left && $this->right) {
-            echo "calc: ".$this->left.' - '.$this->right."<br/>";
-            $this->left = $this->left - $this->right;
-            $this->right = false;
-        }else{
-            return $this->left;
-        }
+        array_push($stack, array_pop($stack) - array_pop($stack));
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
-        if($this->left && $this->right) {
-            echo "calc: ".$this->left.' * '.$this->right."<br/>";
-            $this->left = $this->left * $this->right;
-            $this->right = false;
-        }else{
-            return $this->left;
-        }
+        array_push($stack, array_pop($stack) * array_pop($stack));
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
-        echo "in leaf<br/>";
-        if(!$this->left) {
-            $this->left = $leaf->getValue();
-            echo "set left to ".$this->left."<br/>";
-            //$this->right = false;
-        }else{
-            $this->right = $leaf->getValue();
-            echo "set right to ".$this->right."<br/>";
-        }
-        return;
+        array_push($stack, $leaf->getValue());
     }
+    
     public function isLeaf(ArithmeticComponent $leaf) {
         return $leaf->isLeaf();
     }
@@ -168,17 +145,17 @@ class AritheticIterator {
             $this->postOrder($composite->getLeft());
             $this->postOrder($composite->getRight());
         }
-        $composite->accept($visitor);
+        $composite->accept($this->visitor);
     }
     public function inCalcOrder(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
             $this->inOrder($composite->getLeft());
         }
         
-        if($composite->isLeaf()) $composite->accept($visitor);
+        if($composite->isLeaf()) $composite->accept($this->visitor);
         
         if(!$composite->isLeaf()) {
-            $composite->accept($visitor);
+            $composite->accept($this->visitor);
             $this->inOrder($composite->getRight());
         }
         return $result;
@@ -191,10 +168,10 @@ class AritheticIterator {
             $result .= $this->inOrder($composite->getLeft());
         }
         
-        if($composite->isLeaf()) $result .= $composite->accept($visitor);
+        if($composite->isLeaf()) $result .= $composite->accept($this->visitor);
         
         if(!$composite->isLeaf()) {
-            $result .= $composite->accept($visitor);
+            $result .= $composite->accept($this->visitor);
             $result .= $this->inOrder($composite->getRight());
             $result .= ')';
         }
@@ -223,7 +200,8 @@ function main() {
     echo $iterator->inOrder($add_brackets);
     
     $iterator2 = new AritheticIterator($evaluate);
-    echo $iterator2->postOrder($add_brackets);
+    $iterator2->postOrder($add_brackets);
+    echo $evaluate->getResult();
     
     //echo $iterator->traverse($add_brackets->accept($print))." = ",$iterator->traverse($add_brackets->accept($evaluate));
 }
