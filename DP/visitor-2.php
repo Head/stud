@@ -24,7 +24,8 @@ class EvaluateVisitor extends Visitor {
     
     public function visitPlus(PlusComposite $composite) {
         if($this->left && $this->right) {
-            $this->left = $this->left * $this->right;
+            echo "calc: ".$this->left.' + '.$this->right."<br/>";
+            $this->left = $this->left + $this->right;
             $this->right = false;
         }else{
             return $this->left;
@@ -33,7 +34,8 @@ class EvaluateVisitor extends Visitor {
 
     public function visitMinus(MinusComposite $composite) {
         if($this->left && $this->right) {
-            $this->left = $this->left * $this->right;
+            echo "calc: ".$this->left.' - '.$this->right."<br/>";
+            $this->left = $this->left - $this->right;
             $this->right = false;
         }else{
             return $this->left;
@@ -42,6 +44,7 @@ class EvaluateVisitor extends Visitor {
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
         if($this->left && $this->right) {
+            echo "calc: ".$this->left.' * '.$this->right."<br/>";
             $this->left = $this->left * $this->right;
             $this->right = false;
         }else{
@@ -50,11 +53,14 @@ class EvaluateVisitor extends Visitor {
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
+        echo "in leaf<br/>";
         if(!$this->left) {
             $this->left = $leaf->getValue();
-            $this->right = false;
+            echo "set left to ".$this->left."<br/>";
+            //$this->right = false;
         }else{
-            return $this->left;
+            $this->right = $leaf->getValue();
+            echo "set right to ".$this->right."<br/>";
         }
         return;
     }
