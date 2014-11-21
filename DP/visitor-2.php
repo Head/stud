@@ -143,7 +143,7 @@ class AritheticIterator {
             $result .= $this->inOrder($composite->getLeft(), $visitor);
         }
         
-        $result .= $composite->accept($visitor);
+        if($composite->isLeaf()) $result .= $composite->accept($visitor);
         
         if(!$composite->isLeaf()) {
             $result .= $composite->accept($visitor);
