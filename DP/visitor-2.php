@@ -186,14 +186,14 @@ abstract class AritheticIterator {
 class inOrderIterator extends AritheticIterator {
     public function traverse(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
-            $this->inOrder($composite->getLeft());
+            $this->traverse($composite->getLeft());
         }
         
         if($composite->isLeaf()) $composite->accept($this->visitor);
         
         if(!$composite->isLeaf()) {
             $composite->accept($this->visitor);
-            $this->inOrder($composite->getRight());
+            $this->traverse($composite->getRight());
         }
     }
 }
@@ -201,8 +201,8 @@ class inOrderIterator extends AritheticIterator {
 class postOrderIterator extends AritheticIterator {
     public function traverse(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
-            $this->postOrder($composite->getLeft());
-            $this->postOrder($composite->getRight());
+            $this->traverse($composite->getLeft());
+            $this->traverse($composite->getRight());
         }
         $composite->accept($this->visitor);
     }
