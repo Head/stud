@@ -124,7 +124,7 @@ class PrintVisitor extends Visitor {
         return $leaf->isLeaf();
     }
     public function getResult() {
-        return $this->string . str_repeat(')', $this->counterRight);;
+        return $this->string;
     }
 }
 
@@ -243,9 +243,9 @@ class inOrderIterator extends AritheticIterator {
         $composite->accept($this->visitor);
 
         if($composite->getRight()) {
-            $composite->accept($this->visitor);
             $this->traverse($composite->getRight());
             $this->visitor->setVisit(3);
+            $composite->accept($this->visitor);
         }
     }
 }
