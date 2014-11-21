@@ -24,33 +24,37 @@ class EvaluateVisitor extends Visitor {
     
     public function visitPlus(PlusComposite $composite) {
         if($this->left && $this->right) {
-            return $this->left * $this->right;
+            $this->left = $this->left * $this->right;
+            $this->right = false;
         }else{
-            return $composite->getRight();
+            return $this->left;
         }
     }
 
     public function visitMinus(MinusComposite $composite) {
         if($this->left && $this->right) {
-            return $this->left * $this->right;
+            $this->left = $this->left * $this->right;
+            $this->right = false;
         }else{
-            return $composite->getRight();
+            return $this->left;
         }
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
         if($this->left && $this->right) {
-            return $this->left * $this->right;
+            $this->left = $this->left * $this->right;
+            $this->right = false;
         }else{
-            return $composite->getRight();
+            return $this->left;
         }
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
         if(!$this->left) {
             $this->left = $leaf->getValue();
+            $this->right = false;
         }else{
-            $this->right = $leaf->getValue();
+            return $this->left;
         }
         return;
     }
@@ -149,7 +153,7 @@ class AritheticIterator {
     public function postOrder(ArithmeticComponent $composite, Visitor $visitor) {
         if(!$composite->isLeaf()) {
             $this->postOrder($composite->getLeft(), $visitor);
-            $this->postOrder($composite->getLeft(), $visitor);
+            $this->postOrder($composite->getRight(), $visitor);
         }
         $composite->accept($visitor);
     }
@@ -192,7 +196,7 @@ function main() {
     $iterator = new AritheticIterator();
     echo $iterator->inOrder($add_brackets, $print);
     
-    echo $iterator->inOrder($add_brackets, $evaluate);
+    echo $iterator->postOrder($add_brackets, $evaluate);
     
     //echo $iterator->traverse($add_brackets->accept($print))." = ",$iterator->traverse($add_brackets->accept($evaluate));
 }
