@@ -146,7 +146,7 @@ class NumberLeaf extends ArithmeticComponent {
 }
 
 
-class AritheticIterator {
+abstract class AritheticIterator {
     private $visitor;
     
     public function __construct($visitor) {
