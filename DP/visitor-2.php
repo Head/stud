@@ -16,11 +16,6 @@ abstract class Visitor {
     abstract function visitLeaf(NumberLeaf $leaf);
     abstract function isLeaf(ArithmeticComponent $leaf);
     
-    private $state;
-    
-    public function setVisit($state) {
-        $this->state = $state;
-    }
 }
 
 class EvaluateVisitor extends Visitor {
@@ -62,6 +57,12 @@ class PrintVisitor extends Visitor {
     
     public function __construct() {
         $this->string  = '';
+    }
+    
+    private $state;
+    
+    public function setVisit($state) {
+        $this->state = $state;
     }
     
     public function visitPlus(PlusComposite $composite) {
