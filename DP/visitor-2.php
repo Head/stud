@@ -234,7 +234,7 @@ function main() {
     
     $iteratorIn = new inOrderIterator($print);
     $iteratorIn->traverse($add_brackets);
-    echo $evaluate->getResult();
+    echo $print->getResult();
     
     $iteratorPost = new postOrderIterator($evaluate);
     $iteratorPost->traverse($add_brackets);
