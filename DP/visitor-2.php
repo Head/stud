@@ -61,33 +61,39 @@ class PrintVisitor extends Visitor {
     }
     
     public function visitPlus(PlusComposite $composite) {
-        if($this->counter==2) {
-            $this->string .= ')';
-            $this->counter-=2;
+        if($this->counter>=2) {
+            $this->string .= str_repeat(')', $this->counter);
+            $this->counter = 0;
         }
         $this->string .= ' + ';
+        
+        $this->counter++;
     }
 
     public function visitMinus(MinusComposite $composite) {
-        if($this->counter==2) {
-            $this->string .= ')';
-            $this->counter-=2;
+        if($this->counter>=2) {
+            $this->string .= str_repeat(')', $this->counter);
+            $this->counter = 0;
         }
         $this->string .= ' - ';
+        
+        $this->counter++;
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
-        if($this->counter==2) {
-            $this->string .= ')';
-            $this->counter-=2;
+        if($this->counter>=2) {
+            $this->string .= str_repeat(')', $this->counter);
+            $this->counter = 0;
         }
         $this->string .= ' * ';
+        
+        $this->counter++;
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
-        if($this->counter==0) $this->string .= '(';
+        $this->string .= str_repeat('(', $this->counter);
         $this->string .= $leaf->getValue();
-        $this->counter++;
+        
     }
     public function isLeaf(ArithmeticComponent $leaf) {
         return $leaf->isLeaf();
@@ -254,7 +260,7 @@ function main() {
     
     $iteratorPost = new postOrderIterator($evaluate);
     $iteratorPost->traverse($add_brackets);
-    echo $evaluate->getResult();
+    echo ' = '.$evaluate->getResult();
     
     //echo $iterator->traverse($add_brackets->accept($print))." = ",$iterator->traverse($add_brackets->accept($evaluate));
 }
