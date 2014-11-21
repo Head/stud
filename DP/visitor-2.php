@@ -53,25 +53,32 @@ class EvaluateVisitor extends Visitor {
 class PrintVisitor extends Visitor {
     
     private $string;
+    private $counter;
     
     public function __construct() {
-        $this->string = '';
+        $this->string  = '';
+        $this->counter = 0;
     }
     
     public function visitPlus(PlusComposite $composite) {
         $this->string .= ' + ';
+        $this->counter--;
     }
 
     public function visitMinus(MinusComposite $composite) {
         $this->string .= ' - ';
+        $this->counter--;
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
         $this->string .= ' * ';
+        $this->counter--;
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
+        if($this->counter==0) $this->string .= '(';
         $this->string .= $leaf->getValue();
+        $this->counter++;
     }
     public function isLeaf(ArithmeticComponent $leaf) {
         return $leaf->isLeaf();
