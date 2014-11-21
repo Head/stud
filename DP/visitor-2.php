@@ -156,39 +156,46 @@ class NumberLeaf extends ArithmeticComponent {
 
 
 class AritheticIterator {
-    public function postOrder(ArithmeticComponent $composite, Visitor $visitor) {
+    
+    private $visitor;
+    
+    public function __construct($visitor) {
+        $this->visitor = $visitor;
+    }
+    
+    public function postOrder(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
-            $this->postOrder($composite->getLeft(), $visitor);
-            $this->postOrder($composite->getRight(), $visitor);
+            $this->postOrder($composite->getLeft());
+            $this->postOrder($composite->getRight());
         }
         $composite->accept($visitor);
     }
-    public function inCalcOrder(ArithmeticComponent $composite, Visitor $visitor) {
+    public function inCalcOrder(ArithmeticComponent $composite) {
         if(!$composite->isLeaf()) {
-            $this->inOrder($composite->getLeft(), $visitor);
+            $this->inOrder($composite->getLeft());
         }
         
         if($composite->isLeaf()) $composite->accept($visitor);
         
         if(!$composite->isLeaf()) {
             $composite->accept($visitor);
-            $this->inOrder($composite->getRight(), $visitor);
+            $this->inOrder($composite->getRight());
         }
         return $result;
     }
     
-    public function inOrder(ArithmeticComponent $composite, Visitor $visitor) {
+    public function inOrder(ArithmeticComponent $composite) {
         $result = '';
         if(!$composite->isLeaf()) {
             $result .= '(';
-            $result .= $this->inOrder($composite->getLeft(), $visitor);
+            $result .= $this->inOrder($composite->getLeft());
         }
         
         if($composite->isLeaf()) $result .= $composite->accept($visitor);
         
         if(!$composite->isLeaf()) {
             $result .= $composite->accept($visitor);
-            $result .= $this->inOrder($composite->getRight(), $visitor);
+            $result .= $this->inOrder($composite->getRight());
             $result .= ')';
         }
         return $result;
@@ -212,10 +219,11 @@ function main() {
     $print                  = new PrintVisitor();
     $evaluate               = new EvaluateVisitor();
     
-    $iterator = new AritheticIterator();
-    echo $iterator->inOrder($add_brackets, $print);
+    $iterator = new AritheticIterator($print);
+    echo $iterator->inOrder($add_brackets);
     
-    echo $iterator->inCalcOrder($add_brackets, $evaluate);
+    $iterator2 = new AritheticIterator($evaluate);
+    echo $iterator2->postOrder($add_brackets);
     
     //echo $iterator->traverse($add_brackets->accept($print))." = ",$iterator->traverse($add_brackets->accept($evaluate));
 }
