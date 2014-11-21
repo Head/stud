@@ -21,6 +21,10 @@ class EvaluateVisitor extends Visitor {
     
     private $stack;
     
+    public function __construct() {
+        $this->stack = array();
+    }
+    
     public function getResult($param) {
         return array_pop($stack);
     }
