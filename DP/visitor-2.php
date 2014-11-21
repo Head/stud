@@ -25,24 +25,24 @@ class EvaluateVisitor extends Visitor {
         $this->stack = array();
     }
     
-    public function getResult($param) {
-        return array_pop($stack);
+    public function getResult() {
+        return array_pop($this->stack);
     }
     
     public function visitPlus(PlusComposite $composite) {
-        array_push($stack, array_pop($stack) + array_pop($stack));
+        array_push($this->stack, array_pop($this->stack) + array_pop($this->stack));
     }
 
     public function visitMinus(MinusComposite $composite) {
-        array_push($stack, array_pop($stack) - array_pop($stack));
+        array_push($this->stack, array_pop($this->stack) - array_pop($this->stack));
     }
 
     public function visitMultiplicate(MultiplicateComposite $composite) {
-        array_push($stack, array_pop($stack) * array_pop($stack));
+        array_push($this->stack, array_pop($this->stack) * array_pop($this->stack));
     }
 
     public function visitLeaf(NumberLeaf $leaf) {
-        array_push($stack, $leaf->getValue());
+        array_push($this->stack, $leaf->getValue());
     }
     
     public function isLeaf(ArithmeticComponent $leaf) {
