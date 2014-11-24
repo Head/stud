@@ -335,7 +335,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 		}
 
         $scope.jokerSearch = function() {
-			if($scope.SearchLeft != true){
+			if($scope.showSearch != true){
 				if($scope.points >= 2){
 						$scope.points -= 2;
 
