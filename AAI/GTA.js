@@ -92,6 +92,11 @@ angular.module('myApp.AAI', ['ngRoute'])
 
             //console.debug($scope.artist);
 
+            // TODO: sep func
+            var ext = $scope.artist.pic.substr($scope.artist.pic.lastIndexOf('.') + 1);
+            $scope.artist.pic = "AAI/imgs/"+$scope.artist.pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
+
+
             // check if picture is present
             while(!imageExists($scope.artist.pic)) {
                 // if the image is not loading the picture will be removed from the stack
@@ -101,6 +106,10 @@ angular.module('myApp.AAI', ['ngRoute'])
                 // the new painting must also be removed from the pool
                 $scope.paintingPool.splice($scope.paintingPoolIndex,1);
                 console.debug("no image 404 - choose next of 20 stack");
+
+                // TODO: sep func
+                var ext = $scope.artist.pic.substr($scope.artist.pic.lastIndexOf('.') + 1);
+                $scope.artist.pic = "AAI/imgs/"+$scope.artist.pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
             }
 
             // Fetch false answers for the given artist and painting
@@ -267,6 +276,11 @@ angular.module('myApp.AAI', ['ngRoute'])
 
 					console.debug(data.length);
 
+                    // TODO: sep func
+                    var ext = data[img].pic.substr(data[img].pic.lastIndexOf('.') + 1);
+                    data[img].pic = "AAI/imgs/"+data[img].pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
+                    console.debug(data[img].pic);
+
 					if(data.length > 0){
 
 						// Schauen das das Bild erreichbar ist, wenn nicht nächstes
@@ -277,6 +291,10 @@ angular.module('myApp.AAI', ['ngRoute'])
 								ok = false;
 								break;
 							}
+
+                            // TODO: sep func
+                            var ext = data[img].pic.substr(data[img].pic.lastIndexOf('.') + 1);
+                            data[img].pic = "AAI/imgs/"+data[img].pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
 						}
 
 						// Für den Fall das das ausgewählte Bild das gerade dargestellte vom Künstler ist, nächstes Bild suchen
@@ -289,6 +307,11 @@ angular.module('myApp.AAI', ['ngRoute'])
 										ok = false;
 										break;
 									}
+                                    
+                                    // TODO: sep func
+                                    var ext = data[img].pic.substr(data[img].pic.lastIndexOf('.') + 1);
+                                    data[img].pic = "AAI/imgs/"+data[img].pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
+
 								}
 							}else{
 								ok = false;
@@ -300,7 +323,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 
 					// Bild anzeigen
 					if(ok){
-						$scope.answers[i].url = data[img].pic;
+                        $scope.answers[i].url = data[img].pic;
 					}else{
 						$scope.answers[i].url = "http://i58.tinypic.com/4tlwlc.png";
 					}
