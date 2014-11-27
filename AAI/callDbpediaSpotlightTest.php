@@ -130,7 +130,8 @@ function debug_to_console( $data ) {
 	// Set options for cURL -> https://github.com/dbpedia-spotlight/dbpedia-spotlight/wiki/Web-service
 	curl_setopt_array($curl, array(
 		CURLOPT_RETURNTRANSFER => 1,
-		CURLOPT_URL => 'http://spotlight.dbpedia.org/rest/candidates' .
+		//CURLOPT_URL => 'http://spotlight.dbpedia.org/rest/candidates' .   //bringt Ergebnisse ohne vollständige URIs
+		CURLOPT_URL => 'http://spotlight.dbpedia.org/rest/annotate' .
 		'?text=' . $descr .
 		'&confidence=0.2' . 	
 		'&support=20',
@@ -138,7 +139,7 @@ function debug_to_console( $data ) {
 		/* couldn't get post to work, that's why i'm using get ^
 		CURLOPT_POST => TRUE,
 		CURLOPT_POSTFIELDS => array(
-			text => 'This is a test text. Universities exchange gold for stuff. Colorless green words sleep furiously.',
+			text => 'This is a test text.',
 			//conferenceResolution => '',
 			confidence => '0.2',
 			support => '20'
