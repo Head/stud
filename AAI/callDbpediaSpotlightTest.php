@@ -227,4 +227,15 @@ WHERE
 	
 	
 */
+
+/*
+    $catDescs should be a map with the painting as key and a list of categories as value, e.g.:
+
+    array("dbpedia:Baronci_Altarpiece" => array(Holiday, Film, TelevisionShow), )
+*/
+function saveCategorizePaintingsToFuseki( $catPaintings ) {
+
+
+}
+
 ?>
