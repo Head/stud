@@ -94,6 +94,8 @@ WHERE
 	}
 */
 
+/*
+
 //###########################
 //###########################
 // test request to dbpedia spotlight
@@ -140,18 +142,123 @@ WHERE
 	
 	$result = escapeJsonString($result);
 	
+*/
+
+//###########################
+//###########################
+// Continue with "test"-JSON
+
+	//data that is obtained in a loop -> label of painting and analyzis of description text
+	$result_piclabel = "DBpedia:The_Dream_of_the_Fisherman's_Wife";  // Das Bild wird mich noch lange verfolgen...
+	
+	$result='{	"@text":"blah picture description blah",
+				"Resources":[
+					{
+						"@types":"Freebase:/time/event,Freebase:/time,Freebase:/book/book_subject,Freebase:/book,Freebase:/film/film_subject,Freebase:/film,DBpedia:TopicalConcept"
+					},
+					{
+						"@types":"DBpedia:AdministrativeRegion,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Freebase:/film/film_location,Freebase:/film,Freebase:/location/location,Freebase:/location,Freebase:/location/dated_location"
+					},
+					{
+						"@types":"Freebase:/fictional_universe/fictional_setting,Freebase:/fictional_universe,Freebase:/fictional_universe/type_of_fictional_setting"
+					},
+					{
+						"@types":"DBpedia:Country,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Schema:Country,Freebase:/location/statistical_region,Freebase:/location,Freebase:/royalty/system_of_nobility,Freebase:/royalty,Freebase:/royalty/kingdom,Freebase:/military/military_service,Freebase:/military,Freebase:/location/country,Freebase:/location/dated_location,Freebase:/location/location,Freebase:/military/military_combatant,DBpedia:TopicalConcept"
+					},
+					{
+						"@types":"DBpedia:Country,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Schema:Country,Freebase:/location/country,Freebase:/location,Freebase:/location/dated_location,Freebase:/location/location,Freebase:/book/book_subject,Freebase:/book,Freebase:/military/military_combatant,Freebase:/military,Freebase:/location/statistical_region,Freebase:/royalty/kingdom,Freebase:/royalty,Freebase:/government/governmental_jurisdiction,Freebase:/government"
+					},
+					{
+						"@types":"DBpedia:Country,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Schema:Country,Freebase:/location/dated_location,Freebase:/location,Freebase:/location/statistical_region,Freebase:/government/government,Freebase:/government,Freebase:/location/country,Freebase:/book/book_subject,Freebase:/book,Freebase:/education/field_of_study,Freebase:/education,Freebase:/location/location,Freebase:/organization/organization_member,Freebase:/organization"
+					},
+					{
+						"@types":"DBpedia:Country,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Schema:Country,Freebase:/projects/project_focus,Freebase:/projects,Freebase:/government/governmental_jurisdiction,Freebase:/government,Freebase:/location/country,Freebase:/location,Freebase:/film/film_subject,Freebase:/film,Freebase:/education/field_of_study,Freebase:/education,Freebase:/book/book_subject,Freebase:/book,Freebase:/location/dated_location,Freebase:/aviation/aircraft_owner,Freebase:/aviation,Freebase:/location/location,Freebase:/location/statistical_region,Freebase:/military/military_combatant,Freebase:/military,DBpedia:TopicalConcept"
+					},
+					{
+						"@types":"DBpedia:AdministrativeRegion,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Freebase:/film/film_location,Freebase:/film,Freebase:/location/location,Freebase:/location,Freebase:/location/dated_location"
+					},
+					{
+						"@types":""
+					},
+					{
+						"@types":"DBpedia:City,DBpedia:Settlement,DBpedia:PopulatedPlace,DBpedia:Place,Schema:Place,Schema:City,Freebase:/travel/travel_destination,Freebase:/travel,Freebase:/location/citytown,Freebase:/location,Freebase:/film/film_location,Freebase:/film,Freebase:/protected_sites/listed_site,Freebase:/protected_sites,Freebase:/architecture/architectural_structure_owner,Freebase:/architecture,Freebase:/location/statistical_region,Freebase:/olympics/olympic_host_city,Freebase:/olympics,Freebase:/government/political_district,Freebase:/government,Freebase:/location/administrative_division,Freebase:/location/de_state,Freebase:/business/employer,Freebase:/business,Freebase:/government/governmental_jurisdiction,Freebase:/location/location,Freebase:/organization/organization_scope,Freebase:/organization,Freebase:/location/de_city,Freebase:/olympics/olympic_bidding_city,Freebase:/business/business_location,Freebase:/fictional_universe/fictional_setting,Freebase:/fictional_universe,Freebase:/location/place_with_neighborhoods,Freebase:/location/dated_location,Freebase:/book/book_subject,Freebase:/book,Freebase:/sports/sports_team_location,Freebase:/sports,DBpedia:TopicalConcept"
+					},
+					{
+						"@types":"DBpedia:TopicalConcept"
+					}
+				]
+			}';
+				 
+	// build an array with the painting and the first three categories find from the analyzis
+	$catpaintings[$result_piclabel] = getCategories( $result );
+
+	var_dump($catpaintings);
+	
+	
+	
+/*
+   $jsonSpotlightResult should be the returned JSON object from DBpedia spotlight. The important part of the return object is the "Resources" array with the key "@types"
+	Expected structure:
+	{	"@text":"blah picture description blah",
+		"XXX":"other stuff",
+		"Resources":[
+			{
+				"XXX:":"blah",
+				"@types":"Freebase:/time/event,Freebase:/time,Freebase:/book/book_subject,Freebase:/book,Freebase:/film/film_subject,Freebase:/film,DBpedia:TopicalConcept"
+			},
+			{
+				"XXX:":"blah",
+				"@types":"Freebase:/time/event,Freebase:/time,Freebase:/book/book_subject,Freebase:/book,Freebase:/film/film_subject,Freebase:/film,DBpedia:TopicalConcept"
+			}
+		]
+	}
+*/
+function getCategories( $jsonSpotlightResult ) {
+
 	//encode to array
-	$json = json_decode($result, true);
+	$json = json_decode($jsonSpotlightResult, true);
 	
 	//see the decoded result
-	var_dump($json);
+	//var_dump($json);
 	
-	//here come the errors
-	echo $json['@text']; //[0]['@types'];
+	//test output
+	//echo $json['@text'];
 	
-	foreach ($json['Resources'] as $r) { // This will search in the 2 jsons
-		echo $r['@types'];
+	$categories = array();
+	
+	foreach ($json['Resources'] as $r) { 
+		$types = $r['@types'];
+		
+		// only search if string > 0 and Dbpedia resource is found
+		// cut out the substring we want -> "DBpedia:XXXX"
+		if($types !== '' && stristr($types, 'DBpedia:') !== FALSE){
+			$posDbpedia = stripos($types, 'DBpedia:');
+			$posEnd = stripos($types, ',', $posDbpedia);
+			
+			// if it's the last category there's no ',' found at the end
+			if($posEnd === FALSE){
+				$posEnd = strlen($types);
+			}
+			
+			// get the substring
+			$ergebnis = substr($types, $posDbpedia, ($posEnd - $posDbpedia));
+			
+			// append substring to categories array if it's not in the array yet
+			if (in_array($ergebnis, $categories)) {
+				continue;	
+			}else{
+				array_push($categories, $ergebnis);
+			}
+			
+			// only get the first three categories found
+			if(count($categories) == 3){
+				break;
+			}
+		}
 	}
+
+	return $categories;
+}
 
 /*
     $catDescs should be a map with the painting as key and a list of categories as value, e.g.:
