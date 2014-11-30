@@ -92,9 +92,9 @@ function runAllRequestsAndSaveThemToFile($filename){
 	//do curl requests
 	$i = 0;
 	foreach ($listOfPaintings as $p) { 
-		// if($i > 2){
-			// break;
-		// }
+		if($i > 2){
+			break;
+		}
 	
 		$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
 		
@@ -102,15 +102,20 @@ function runAllRequestsAndSaveThemToFile($filename){
 			
 		$categs = getCategories( $json_output );
 		$paintingcategories[$p['label']] = $categs;
+		
+		//write array into text-file
+		file_put_contents($filename, json_encode($paintingcategories, true) . PHP_EOL, FILE_APPEND);
+		debug_to_console('succesfully appended ' . $i . '. painting categories into file: ' . $filename);
+		
 		$i++;
 		//debug_to_console($i);
 	}
 
 	//write array into text-file
-	file_put_contents($filename, json_encode($paintingcategories, true));
-	debug_to_console('succesfully wrote categories into file: ' . $filename);
+	//file_put_contents($filename, json_encode($paintingcategories, true));
+	//debug_to_console('succesfully wrote all categories into file: ' . $filename);
 	//var_dump($paintingcategories);
-	//debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
+	debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
 }
 
 
@@ -228,7 +233,7 @@ function multiRequest($data) {
   // data to be returned
   $result = array();
   
-  //header('Content-Type', 'application/json');
+  header('Content-Type', 'application/json');
 
   // multi handle
   $mh = curl_multi_init();
@@ -242,7 +247,7 @@ function multiRequest($data) {
     $url = (is_array($d) && !empty($d['url'])) ? $d['url'] : $d;
     curl_setopt($curly[$id], CURLOPT_URL,            $url);
     curl_setopt($curly[$id], CURLOPT_HEADER,         0);
-    curl_setopt($curly[$id], CURLOPT_HTTPHEADER,     array('Content-Type: application/json', 'Accept: application/json', 'charset=utf-8'));
+    curl_setopt($curly[$id], CURLOPT_HTTPHEADER,     array('Accept: application/json', 'charset=utf-8'));
     curl_setopt($curly[$id], CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curly[$id], CURLOPT_TIMEOUT, 		 400); //The maximum number of seconds to allow cURL functions to execute. timeout in seconds 
     curl_setopt($curly[$id], CURLOPT_CONNECTTIMEOUT, 0); //The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
