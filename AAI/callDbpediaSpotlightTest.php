@@ -1,6 +1,8 @@
 <?php
 
 	include_once("../ARC2/ARC2.php");
+	
+	set_time_limit(0);// to infinity and beyond
  
 /*
 	just a helper to write to console
@@ -60,72 +62,150 @@ $result='{	"@text":"blah picture description blah",
 	
 */
 
+//----------------------------------------
 // START ACTUALLY DOING SOMETHING HERE
+//----------------------------------------
 
 //retrieve array with paintings (label & description)
-$paintings = getPaintings(true); // true -> reads from paintings.txt, to get all data from Server use "false"
+$listOfPaintings = getPaintings(true); // true -> reads from paintings.txt, to get all data from Server use "false"
 
-debug_to_console('Count of returned paintings: ' . count($paintings));
+debug_to_console('Count of returned paintings: ' . count($listOfPaintings));
 //var_dump($paintings);
-	
-	
-//code for multi curl:
 
-//set up array with get urls
-$competeRequests = array();
-foreach($paintings as $val) {
-    $competeRequests[] = 'http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($val['descr']) . '&confidence=0.2&support=20';
-	//break; // breaking here to test with first image. 
-}
+//initiate multi curl request
+//doMultiCurl($listOfPaintings);
 
-debug_to_console($competeRequests);
+$paintingcategories = array();
 
-//first batch
-$curlRequest = array();
-foreach (array_chunk($competeRequests, 100) as $requests) { // processing in batches of 100 [max = 1000]
-    $results = multiRequest($requests);
-    $curlRequest = array_merge($curlRequest, $results);
-}
-// currently this is an empty array??
-//var_dump($curlRequest);
-//debug_to_console($curlRequest); // = the result from dbpediaspotlight
-
-$catpaintings = array();
-$j = 0;
-// process the result 
-foreach ($curlRequest as $json){
+//try single curl request
+$i = 0;
+foreach ($listOfPaintings as $p) { // processing in batches of 100 [max = 1000]
+	//if($i > 50){
+	//	break;
+	//}
 	
-    $json_output = json_decode($json, TRUE);
-	$types = $json_output['Resources'][$j]['@types'];
-    //var_dump("OUTPUT JSON STUFF" . $json_output['Resources'][$j]['@types']);
-	debug_to_console($types); // Zwischendurch hab ich hier mal das richtige ausgegeben bekommen X.X (ohne excapen oder ähnliches)
-	
-	/*
-	// escape stuff 
-	//$result = preg_replace('/(\\\\n|\\\\t)/', '', $result);
-	//stripslashes($result);
-	function escapeJsonString($value) {
-		$escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
-		$replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");
-		$result = str_replace($escapers, $replacements, $value);
-		return $result;
-	}
-	*/
-	
-	// build an array with the painting and the first three categories found from the analysis
+	$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
+	$json_output = json_decode($result, TRUE);
+		
 	$categs = getCategories( $json_output );
-	//debug_to_console($categs);
-	$catpaintings[$paintings[$j]['label']] = $categs;
-	
-    $j++;
-	//$result = escapeJsonString($result);
+	$paintingcategories[$p['label']] = $categs;
+	$i++;
+	//debug_to_console($i);
 }
 
-var_dump($catpaintings);
-debug_to_console(count($catpaintings));
+//----------------------------------------
+// Hier ist das fertige Array:
+//----------------------------------------
+var_dump($paintingcategories);
+debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
 
 
-/*
+
+//----------------------------------------
+// BELOW ARE DEFINED FUNCTIONS
+//----------------------------------------
+
+
+// single request to dbpedia - this one is used
+// ---------
+function singleRequest($url){
+	
+	header('Content-Type', 'application/json');
+
+	// Get cURL
+	$curl = curl_init();
+	
+	//Set the text to be sent to dbpedia spotlight
+	$descr = 'First documented in the 13th century, Berlin was the capital of the Kingdom of Prussia (1701–1918), the German Empire (1871–1918), the Weimar Republic (1919–33) and the Third Reich (1933–45). Berlin in the 1920s was the third largest municipality in the world. After World War II, the city became divided into East Berlin -- the capital of East Germany -- and West Berlin, a West German exclave surrounded by the Berlin Wall from 1961–89. Following German reunification in 1990, the city regained its status as the capital of Germany, hosting 147 foreign embassies.';
+	//$descr = 'This is a test text about Christmas and Santa Clause giving gifts to the Lost Boys of Neverland in Canada flying Serenity into outer space.';
+	$descr = urlencode($descr);
+	
+	// Set options for cURL -> https://github.com/dbpedia-spotlight/dbpedia-spotlight/wiki/Web-service
+	curl_setopt_array($curl, array(
+		CURLOPT_RETURNTRANSFER => 1,
+		CURLOPT_HTTPHEADER => array('Accept: application/json', 'charset=utf-8'),
+		CURLOPT_HEADER => false,
+		CURLOPT_CONNECTTIMEOUT => 0, //The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
+		CURLOPT_TIMEOUT => 400, //The maximum number of seconds to allow cURL functions to execute. timeout in seconds 
+		CURLOPT_URL => $url
+	));
+	
+	// Send request and get result
+	
+	$result = curl_exec($curl);
+	// Close request
+	curl_close($curl);
+	//output json to console
+	//debug_to_console($result);
+	return $result;
+
+}
+
+	
+
+/* not used
+	code for multi curl
+*/
+function doMultiCurl($paintings){
+
+	//set up array with get urls
+	$competeRequests = array();
+	foreach($paintings as $val) {
+		$competeRequests[] = 'http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($val['descr']) . '&confidence=0.2&support=20';
+		break; // breaking here to test with first image. 
+	}
+
+	debug_to_console($competeRequests);
+
+	//first batch
+	$curlRequest = array();
+	foreach (array_chunk($competeRequests, 100) as $requests) { // processing in batches of 100 [max = 1000]
+		$results = multiRequest($requests);
+		$curlRequest = array_merge($curlRequest, $results);
+	}
+	// currently this is an empty array??
+	//var_dump($curlRequest);
+	//debug_to_console($curlRequest); // = the result from dbpediaspotlight
+
+	$catpaintings = array();
+	$j = 0;
+	// process the result 
+	foreach ($curlRequest as $json){
+		
+		$json_output = json_decode($json, TRUE);
+		$types = $json_output['Resources'][$j]['@types'];
+		//var_dump("OUTPUT JSON STUFF" . $json_output['Resources'][$j]['@types']);
+		debug_to_console($types); // Zwischendurch hab ich hier mal das richtige ausgegeben bekommen X.X (ohne excapen oder ähnliches)
+		
+		/*
+		// escape stuff 
+		//$result = preg_replace('/(\\\\n|\\\\t)/', '', $result);
+		//stripslashes($result);
+		function escapeJsonString($value) {
+			$escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
+			$replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");
+			$result = str_replace($escapers, $replacements, $value);
+			return $result;
+		}
+		*/
+		
+		// build an array with the painting and the first three categories found from the analysis
+		$categs = getCategories( $json_output );
+		//debug_to_console($categs);
+		$catpaintings[$paintings[$j]['label']] = $categs;
+		
+		$j++;
+		//$result = escapeJsonString($result);
+	}
+
+	var_dump($catpaintings);
+	debug_to_console(count($catpaintings));
+	
+	return $catpaintings;
+
+}
+
+/* not used
 	Function from guy on here: http://stackoverflow.com/questions/12379801/simultaneous-http-requests-in-php-with-curl
 	
 	$data should be an array with the get urls
@@ -173,48 +253,7 @@ function multiRequest($data) {
 
   return $result;
 
-}
-
-
-	
-
-
-
-
-// old single request to dbpedia (does work)
-// ---------
-/*	
-	header('Content-Type', 'application/json');
-
-	// Get cURL
-	$curl = curl_init();
-	
-	//Set the text to be sent to dbpedia spotlight
-	$descr = 'First documented in the 13th century, Berlin was the capital of the Kingdom of Prussia (1701–1918), the German Empire (1871–1918), the Weimar Republic (1919–33) and the Third Reich (1933–45). Berlin in the 1920s was the third largest municipality in the world. After World War II, the city became divided into East Berlin -- the capital of East Germany -- and West Berlin, a West German exclave surrounded by the Berlin Wall from 1961–89. Following German reunification in 1990, the city regained its status as the capital of Germany, hosting 147 foreign embassies.';
-	//$descr = 'This is a test text about Christmas and Santa Clause giving gifts to the Lost Boys of Neverland in Canada flying Serenity into outer space.';
-	$descr = urlencode($descr);
-	
-	// Set options for cURL -> https://github.com/dbpedia-spotlight/dbpedia-spotlight/wiki/Web-service
-	curl_setopt_array($curl, array(
-		CURLOPT_RETURNTRANSFER => 1,
-		CURLOPT_HTTPHEADER => array('Accept: application/json', 'charset=utf-8'),
-		CURLOPT_HEADER => false,
-		CURLOPT_URL => 'http://spotlight.dbpedia.org/rest/annotate' .
-		'?text=' . $descr .
-		'&confidence=0.2' . 	
-		'&support=20',
-	));
-	
-	
-	// Send request and get result
-	$result = json_encode(curl_exec($curl));
-	// Close request
-	curl_close($curl);
-	//output json to console
-	debug_to_console($result);
-*/
-	
-	
+}	
 	
 	
 /*
