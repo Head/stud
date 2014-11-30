@@ -1,0 +1,1 @@
+{"DBpedia:Madonna_Litta":["DBpedia:Artist","DBpedia:Museum","DBpedia:AdministrativeRegion"],"DBpedia:Perugia_Altarpiece":["DBpedia:Settlement","DBpedia:Artist"],"DBpedia:The_Actor_(painting)":["DBpedia:Artist"]}

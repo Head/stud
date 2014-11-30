@@ -66,44 +66,52 @@ $result='{	"@text":"blah picture description blah",
 // START ACTUALLY DOING SOMETHING HERE
 //----------------------------------------
 
-//retrieve array with paintings (label & description)
-$listOfPaintings = getPaintings(true); // true -> reads from paintings.txt, to get all data from Server use "false"
-
-debug_to_console('Count of returned paintings: ' . count($listOfPaintings));
-//var_dump($paintings);
-
-//initiate multi curl request
-//doMultiCurl($listOfPaintings);
-
-$paintingcategories = array();
-
-//try single curl request
-$i = 0;
-foreach ($listOfPaintings as $p) { // processing in batches of 100 [max = 1000]
-	//if($i > 50){
-	//	break;
-	//}
-	
-	$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
-	$json_output = json_decode($result, TRUE);
-		
-	$categs = getCategories( $json_output );
-	$paintingcategories[$p['label']] = $categs;
-	$i++;
-	//debug_to_console($i);
-}
-
-//----------------------------------------
-// Hier ist das fertige Array:
-//----------------------------------------
-var_dump($paintingcategories);
-debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
+// start doing stuff. And write array into the given file.
+runAllRequestsAndSaveThemToFile('Paintings_and_Categories.txt');
 
 
 
 //----------------------------------------
 // BELOW ARE DEFINED FUNCTIONS
 //----------------------------------------
+
+/*
+	runAllRequestsAndSaveThemToFile()
+	
+	does all the stuff and writes it to file
+*/
+function runAllRequestsAndSaveThemToFile($filename){
+	//retrieve array with paintings (label & description)
+	$listOfPaintings = getPaintings(true); // true -> reads from paintings.txt, to get all data from Server use "false"
+	
+	//debug_to_console('Count of returned paintings: ' . count($listOfPaintings));
+	//var_dump($paintings);
+
+	$paintingcategories = array();
+
+	//do curl requests
+	$i = 0;
+	foreach ($listOfPaintings as $p) { 
+		// if($i > 2){
+			// break;
+		// }
+	
+		$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
+		
+		$json_output = json_decode($result, TRUE);
+			
+		$categs = getCategories( $json_output );
+		$paintingcategories[$p['label']] = $categs;
+		$i++;
+		//debug_to_console($i);
+	}
+
+	//write array into text-file
+	file_put_contents($filename, json_encode($paintingcategories, true));
+	debug_to_console('succesfully wrote categories into file: ' . $filename);
+	//var_dump($paintingcategories);
+	//debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
+}
 
 
 // single request to dbpedia - this one is used
@@ -116,9 +124,9 @@ function singleRequest($url){
 	$curl = curl_init();
 	
 	//Set the text to be sent to dbpedia spotlight
-	$descr = 'First documented in the 13th century, Berlin was the capital of the Kingdom of Prussia (1701–1918), the German Empire (1871–1918), the Weimar Republic (1919–33) and the Third Reich (1933–45). Berlin in the 1920s was the third largest municipality in the world. After World War II, the city became divided into East Berlin -- the capital of East Germany -- and West Berlin, a West German exclave surrounded by the Berlin Wall from 1961–89. Following German reunification in 1990, the city regained its status as the capital of Germany, hosting 147 foreign embassies.';
+	//$descr = 'First documented in the 13th century, Berlin was the capital of the Kingdom of Prussia (1701–1918), the German Empire (1871–1918), the Weimar Republic (1919–33) and the Third Reich (1933–45). Berlin in the 1920s was the third largest municipality in the world. After World War II, the city became divided into East Berlin -- the capital of East Germany -- and West Berlin, a West German exclave surrounded by the Berlin Wall from 1961–89. Following German reunification in 1990, the city regained its status as the capital of Germany, hosting 147 foreign embassies.';
 	//$descr = 'This is a test text about Christmas and Santa Clause giving gifts to the Lost Boys of Neverland in Canada flying Serenity into outer space.';
-	$descr = urlencode($descr);
+	//$descr = urlencode($descr);
 	
 	// Set options for cURL -> https://github.com/dbpedia-spotlight/dbpedia-spotlight/wiki/Web-service
 	curl_setopt_array($curl, array(
@@ -150,9 +158,13 @@ function doMultiCurl($paintings){
 
 	//set up array with get urls
 	$competeRequests = array();
+	$i = 0;
 	foreach($paintings as $val) {
+		if($i > 50){
+			break;
+		}
 		$competeRequests[] = 'http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($val['descr']) . '&confidence=0.2&support=20';
-		break; // breaking here to test with first image. 
+		$i++; //break; // breaking here to test with first image. 
 	}
 
 	debug_to_console($competeRequests);
@@ -232,6 +244,8 @@ function multiRequest($data) {
     curl_setopt($curly[$id], CURLOPT_HEADER,         0);
     curl_setopt($curly[$id], CURLOPT_HTTPHEADER,     array('Content-Type: application/json', 'Accept: application/json', 'charset=utf-8'));
     curl_setopt($curly[$id], CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curly[$id], CURLOPT_TIMEOUT, 		 400); //The maximum number of seconds to allow cURL functions to execute. timeout in seconds 
+    curl_setopt($curly[$id], CURLOPT_CONNECTTIMEOUT, 0); //The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
 	
     curl_multi_add_handle($mh, $curly[$id]);
   }
@@ -245,6 +259,7 @@ function multiRequest($data) {
   // get content and remove handles
   foreach($curly as $id => $c) {
     $result[$id] = curl_multi_getcontent($c);
+	var_dump($result[$id]);
     curl_multi_remove_handle($mh, $c);
   }
 
@@ -381,7 +396,7 @@ function getPaintings( $useTxt ){
 		PREFIX dbpprop: <http://dbpedia.org/property/> 
 		PREFIX foaf: <http://xmlns.com/foaf/0.1/> 
 		PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
-		SELECT DISTINCT ?plabel ?pdesc ' . // previous return: ?painting ?plabel ?artist ?pic ?name ?pdesc 
+		SELECT DISTINCT ?painting ?plabel ?pdesc ' . // was ?painting ?plabel ?artist ?pic ?name ?pdesc '
 		'WHERE 
 		{ ?painting rdf:type yago:Painting103876519 ; 
 					foaf:depiction ?pic .
@@ -413,7 +428,9 @@ function getPaintings( $useTxt ){
 			$results = $store->query($query, 'rows');
 			$i = 0;
 			foreach ($results as $row) {
-				$paintings[] = array('label' => $row['plabel'], 'descr' => $row['pdesc']);
+				$pos = strrpos($row['painting'], '/') + 1;
+				$label = 'DBpedia:' . substr($row['painting'], $pos);
+				$paintings[] = array('label' => $label, 'descr' => $row['pdesc']);
 			}
 		} catch (Exception $e) {
 			print "<div class='error'>".$e->getMessage()."</div>\n";
