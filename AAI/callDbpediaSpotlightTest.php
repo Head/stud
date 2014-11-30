@@ -66,50 +66,52 @@ $result='{	"@text":"blah picture description blah",
 // START ACTUALLY DOING SOMETHING HERE
 //----------------------------------------
 
-//retrieve array with paintings (label & description)
-$listOfPaintings = getPaintings(true); // true -> reads from paintings.txt, to get all data from Server use "false"
-
-debug_to_console('Count of returned paintings: ' . count($listOfPaintings));
-//var_dump($paintings);
-
-$paintingcategories = array();
-
-//initiate multi curl request
-//$paintingcategories = doMultiCurl($listOfPaintings);
-
-//try single curl request
-
-$i = 0;
-foreach ($listOfPaintings as $p) { // processing in batches of 100 [max = 1000]
-	// if($i > 5){
-		// break;
-	// }
-	
-	$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
-	if($result === ''){
-		debug_to_console('No return available');
-		continue;
-	}
-	$json_output = json_decode($result, TRUE);
-		
-	$categs = getCategories( $json_output );
-	$paintingcategories[$p['label']] = $categs;
-	$i++;
-	//debug_to_console($i);
-}
-
-
-//----------------------------------------
-// Hier ist das fertige Array:
-//----------------------------------------
-var_dump($paintingcategories);
-debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
+// start doing stuff. And write array into the given file.
+runAllRequestsAndSaveThemToFile('Paintings_and_Categories.txt');
 
 
 
 //----------------------------------------
 // BELOW ARE DEFINED FUNCTIONS
 //----------------------------------------
+
+/*
+	runAllRequestsAndSaveThemToFile()
+	
+	does all the stuff and writes it to file
+*/
+function runAllRequestsAndSaveThemToFile($filename){
+	//retrieve array with paintings (label & description)
+	$listOfPaintings = getPaintings(true); // true -> reads from paintings.txt, to get all data from Server use "false"
+	
+	//debug_to_console('Count of returned paintings: ' . count($listOfPaintings));
+	//var_dump($paintings);
+
+	$paintingcategories = array();
+
+	//do curl requests
+	$i = 0;
+	foreach ($listOfPaintings as $p) { 
+		// if($i > 2){
+			// break;
+		// }
+	
+		$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
+		
+		$json_output = json_decode($result, TRUE);
+			
+		$categs = getCategories( $json_output );
+		$paintingcategories[$p['label']] = $categs;
+		$i++;
+		//debug_to_console($i);
+	}
+
+	//write array into text-file
+	file_put_contents($filename, json_encode($paintingcategories, true));
+	debug_to_console('succesfully wrote categories into file: ' . $filename);
+	//var_dump($paintingcategories);
+	//debug_to_console('Amount of analysed paintings: ' . count($paintingcategories));
+}
 
 
 // single request to dbpedia - this one is used
