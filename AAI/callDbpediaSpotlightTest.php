@@ -67,8 +67,10 @@ $result='{	"@text":"blah picture description blah",
 //----------------------------------------
 
 // start doing stuff. And write array into the given file.
-runAllRequestsAndSaveThemToFile('Paintings_and_Categories.txt');
+//runAllRequestsAndSaveThemToFile('Paintings_and_Categories.txt');
 
+$array = json_decode(file_get_contents('Paintings_and_Categories.json'),true);
+saveCategorizePaintingsToFuseki( $array );
 
 
 //----------------------------------------
@@ -92,9 +94,9 @@ function runAllRequestsAndSaveThemToFile($filename){
 	//do curl requests
 	$i = 0;
 	foreach ($listOfPaintings as $p) { 
-		if($i > 2){
-			break;
-		}
+		// if($i > 2){
+			// break;
+		// }
 	
 		$result = singleRequest('http://spotlight.dbpedia.org/rest/annotate?text=' . urlencode($p['descr']) . '&confidence=0.2&support=20');
 		
@@ -449,88 +451,15 @@ function getPaintings( $useTxt ){
 	return $paintings;
 }
 
-/*
-	Puts string into file
-*/
-function saveStatements2File($filename, $string) {
-	file_put_contents($filename, $string);
-}
-
-/*
-	Inserts a valid SPQARQL INSERT Statement on the Fuseki-Server. Will print errors (if so) into the html container.
-
-	$insertStatement must be a SPARQL INSERT Statement
-*/
-function fusekiInsert($insertStatement) {
-	$abs = realpath('s-update');
-	exec($abs . " -f fuseki_insert_statements.txt --service http://87.106.81.97:3030/ds/update");
-}
-
-/*
-	This function build SPAQRL INSERT Statements from a map
-	and saves them into an array.
-	Every key will be taken as subject to the INSERT STATEMENT and
-	build upon an entry from the list stored in the value-part of the map.
-
-	$catPaintings must be a map, where each value is a list of strings (the category).
-
-	returns an array of SPARQL INSERT Statements
-
-*/
-function buildInsertStatements($catPaintings) {
-
-	$insertStatements = [];
-	$relation = 'dbpedia:isTipOf';
-
-	foreach($catPaintings as $painting => $categories) {
-
-		foreach ($categories as $category) {
-			$insertStatement = "INSERT DATA {  ${painting} ${relation} '${category}' . };";
-			$insertStatements[] = $insertStatement;
-		}
-	}
-
-	return $insertStatements;
-
-}
-
-/*
-	This function will convert the list of SPARQL INSERT Statements $insertStatements 
-	into a single string with a new-line character after each line.
-	
-	The Prefix "PREFIX dbpedia: <http://dbpedia.org/resource/>" will be 
-	automatically added.
-
-	$insertStatements must be an array of SPARQL INSERT Statements
-
-	returns the concatenated inserts string
-*/
-function buildInsertStatementsString($insertStatements) {
-
-	$prefix = 'PREFIX dbpedia: <http://dbpedia.org/resource/> ' . PHP_EOL;
-	// - Build big String with newline-character after each line
-	$insertStatementsString = implode(PHP_EOL, $insertStatements);
-
-	return $prefix . $insertStatementsString;
-
-}
 
 /*
     $catDescs should be a map with the painting as key and a list of categories as value, e.g.:
 
     array("dbpedia:Baronci_Altarpiece" => array(Holiday, Film, TelevisionShow), )
 */
-function saveCategorizedPaintingsToFuseki( $catPaintings ) {
+function saveCategorizePaintingsToFuseki( $catPaintings ) {
 
-
-	$insertStatements = buildInsertStatements($catPaintings);
-	$insertStatementsString = buildInsertStatementsString($insertStatements);
-	saveStatements2File("fuseki_insert_statements.txt", $insertStatementsString);
-
-	fusekiInsert($insertStatementsString);
 
 }
-
-saveCategorizedPaintingsToFuseki(array("dbpedia:Baronci_Altarpiece" => array("Holiday", "Film", "TelevisionShow", "Krankenhaus") ));
 
 ?>
