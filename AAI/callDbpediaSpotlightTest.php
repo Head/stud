@@ -469,6 +469,31 @@ function fusekiInsert($insertStatement) {
 	exec($abs . " -f fuseki_insert_statements.txt --service http://87.106.81.97:3030/ds/update");
 }
 
+
+/*
+	This Function will search for the special characters:
+	!
+	)
+	(
+	,
+	'
+	and prefix them with a '\' (backslash), e.g.:
+	'show!' will become 'show\!'
+
+	the escaped string will be replaced
+*/
+function sanitizeRDF($string) {
+		
+		$string = str_replace("'", "\'", $string);
+		$string = str_replace(")", "\)", $string);
+		$string = str_replace("(", "\(", $string);
+		$string = str_replace(",", "\,", $string);
+		$string = str_replace("!", "\!", $string);
+
+		return $string;
+
+}
+
 /*
 	This function build SPAQRL INSERT Statements from a map
 	and saves them into an array.
@@ -487,6 +512,7 @@ function buildInsertStatements($catPaintings) {
 
 	foreach($catPaintings as $painting => $categories) {
 
+		$painting = sanitizeRDF($painting);
 		foreach ($categories as $category) {
 			$insertStatement = "INSERT DATA {  ${painting} ${relation} '${category}' . };";
 			$insertStatements[] = $insertStatement;
