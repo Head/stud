@@ -47,10 +47,14 @@ angular.module('myApp.AAI', ['ngRoute'])
         // fetch list of possible artists and paintings
         $scope.next = function() {
             $scope.message = "";
-			
+
 			//reset Search joker
 			$scope.showSearch = $scope.SearchLeft ;
 			$scope.searchResult = "";
+
+            //restet tip joker
+            //$scope.showtipps = false;
+            $scope.tips = "";
 
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
@@ -63,14 +67,15 @@ angular.module('myApp.AAI', ['ngRoute'])
             // query for selecting paintings randomly
             // with the query a stack of 50 paintings is fetched
             // if a painting throws later a picture-404 the next picture in the stack is selected
-            var queryArtist = 'SELECT DISTINCT ?subject ?artist ?pic ?name ' +
+            var queryArtist = 'SELECT DISTINCT ?subject ?artist ?pic ?name ?tip ' +
                 'WHERE { ?subject rdf:type yago:Painting103876519 . ' +
                 '?subject dbpprop:artist ?artist . ' +
                 '?subject foaf:depiction ?pic .' +
-                '?artist rdfs:label ?name ' +
+                '?artist rdfs:label ?name .' +
+                '?pic dbpedia:isTipOf ?tip' +
                 '} ORDER BY ?pic OFFSET '+$scope.paintingPool[$scope.paintingPoolIndex]+' LIMIT 50';
 
-            //console.debug(queryArtist);
+            console.debug(queryArtist);
 
             // remove used painting by the index
             // so the painting will not be fetched by a later followed next() call
@@ -93,9 +98,11 @@ angular.module('myApp.AAI', ['ngRoute'])
             // get data of the artist and painting
             $scope.artist = data[0];
 
-            //console.debug($scope.artist);
+            console.debug("ARTIST PIC");
+            console.debug(data);
 
             // TODO: sep func
+            $scope.artist.oripic = $scope.artist.pic;
             var ext = $scope.artist.pic.substr($scope.artist.pic.lastIndexOf('.') + 1);
             $scope.artist.pic = "AAI/imgs/"+$scope.artist.pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
 
@@ -111,6 +118,7 @@ angular.module('myApp.AAI', ['ngRoute'])
                 console.debug("no image 404 - choose next of 20 stack");
 
                 // TODO: sep func
+                $scope.artist.oripic = $scope.artist.pic;
                 var ext = $scope.artist.pic.substr($scope.artist.pic.lastIndexOf('.') + 1);
                 $scope.artist.pic = "AAI/imgs/"+$scope.artist.pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
             }
@@ -310,7 +318,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 										ok = false;
 										break;
 									}
-                                    
+
                                     // TODO: sep func
                                     var ext = data[img].pic.substr(data[img].pic.lastIndexOf('.') + 1);
                                     data[img].pic = "AAI/imgs/"+data[img].pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
@@ -342,7 +350,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 					$scope.SearchLeft = true;
 					$scope.showSearch = true;
 					$scope.searchPhrase = "";	//clear searchfield
-					
+
 				}
 				else {
 					// else -> evtl. Meldung mit fehlender Punktezahl o.ä.
@@ -351,6 +359,24 @@ angular.module('myApp.AAI', ['ngRoute'])
 			}
         }
 
+
+        $scope.jokerTextTip = function() {
+            var queryArtistTips;
+            var JOKER_ARTIST_POINTS = 2;
+            $scope.showtipps = true;
+
+            if($scope.points >= JOKER_ARTIST_POINTS){
+
+                var queryArtistTips = 'SELECT ?tip WHERE { <'+$scope.artist.oripic+'> dbpedia:isTipOf ?tip } ';
+                console.debug(queryArtistTips);
+                $http.post('query.php', {query: queryArtistTips}).
+                success(function (data, status, headers, config) {
+                    // shuffle array für random Bild
+                    console.debug(data);
+                    $scope.tips = data;
+                });
+            }
+        }
 
 		$scope.search = function() {
 			$http.post('AAI/query_index.php', {query: $scope.searchPhrase}).
