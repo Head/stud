@@ -69,8 +69,8 @@ $result='{	"@text":"blah picture description blah",
 // start doing stuff. And write array into the given file.
 //runAllRequestsAndSaveThemToFile('Paintings_Relations.txt');
 
-$array = json_decode(file_get_contents('Paintings_Relations.txt'),true);
-saveCategorizedPaintingsToFuseki( $array );
+//$array = json_decode(file_get_contents('Paintings_Relations.txt'),true);
+//saveCategorizedPaintingsToFuseki( $array );
 
 
 //----------------------------------------
