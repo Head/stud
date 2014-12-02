@@ -27,6 +27,8 @@ angular.module('myApp.AAI', ['ngRoute'])
         $scope.paintingPoolIndex = 0;
 
         $scope.disabled_answers = [];
+        $scope.hiddenTips = [];
+        $scope.shownTips = [];
 
         // first we count the present paintings
         var queryCountPaintings = 'SELECT (COUNT(?subject) AS ?count) { ?subject rdf:type yago:Painting103876519 }';
@@ -87,6 +89,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             $scope.answers = [];
             $scope.artist  = [];
             $scope.disabled_answers = [];
+            $scope.hiddenTips = [];
             //$scope.loading = true;
             $scope.artist.pic = "https://d13yacurqjgara.cloudfront.net/users/121337/screenshots/916951/small-load.gif";
             $http.post('query.php', {query: queryArtist}).success(fetchRandomArtist);
@@ -215,11 +218,11 @@ angular.module('myApp.AAI', ['ngRoute'])
                         }
                     }
                 }else{
-                    $scope.message = "Es sind nicht genug Antworten verfügbar!";
+                    $scope.message = "You already used this Joker, no cheating!";
                 }
             }
             else {
-                $scope.message = "Sie besitzen nur " + $scope.points + " Punkt(e), benötigen jedoch für den 50-50 Joker mindestens " + JOKER_5050_POINTS + " Punkte!";
+                $scope.message = "You have only " + $scope.points + " point(s) left. You need at least " + JOKER_5050_POINTS + " points for this Joker!";
             }
         }
 
@@ -263,7 +266,7 @@ angular.module('myApp.AAI', ['ngRoute'])
                 selectJokerPics(3);
             }
             else {
-                $scope.message = "Sie besitzen nur" + $scope.points + " Punkte benötigen jedoch " + JOKER_ARTIST_POINTS + " für den Bildvergleich!"
+                $scope.message = "You have only " + $scope.points + " point(s) left. You need at least " + JOKER_ARTIST_POINTS + " points for this Joker!";
             }
         }
 
@@ -343,6 +346,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 		}
 
         $scope.jokerSearch = function() {
+            var JOKER_SEARCH_POINTS = 2;
 			if($scope.showSearch != true){
 				if($scope.points >= 2){
 						$scope.points -= 2;
@@ -353,28 +357,52 @@ angular.module('myApp.AAI', ['ngRoute'])
 
 				}
 				else {
-					// else -> evtl. Meldung mit fehlender Punktezahl o.ä.
-					$scope.message = "Sie besitzen zu wenig Punkte für die Suche!"
+                    $scope.message = "You have only " + $scope.points + " point(s) left. You need at least " + JOKER_SEARCH_POINTS + " points for this Joker!";
 				}
 			}
         }
 
 
         $scope.jokerTextTip = function() {
-            var queryArtistTips;
             var JOKER_ARTIST_POINTS = 2;
-            $scope.showtipps = true;
 
             if($scope.points >= JOKER_ARTIST_POINTS){
+                //Reset points
+                $scope.points -= JOKER_ARTIST_POINTS;
+                $scope.showtipps = true;
+                
+                //if first call, get the tips
+                if($scope.shownTips.length < 1){
+                    var queryArtistTips;
 
-                var queryArtistTips = 'SELECT ?tip WHERE { <'+$scope.artist.oripic+'> dbpedia:isTipOf ?tip } ';
-                console.debug(queryArtistTips);
-                $http.post('query.php', {query: queryArtistTips}).
-                success(function (data, status, headers, config) {
-                    // shuffle array für random Bild
-                    console.debug(data);
-                    $scope.tips = data;
-                });
+                    console.debug("anz Tips " + $scope.hiddenTips.length);
+
+                    var queryArtistTips = 'SELECT ?tip WHERE { <'+$scope.artist.oripic+'> dbpedia:isTipOf ?tip } ';
+                    console.debug(queryArtistTips);
+                    $http.post('query.php', {query: queryArtistTips}).
+                    success(function (data, status, headers, config) {
+                        $scope.hiddenTips = data;
+
+                        //display the first tip but replace the name of the artist
+                        var obj = $scope.hiddenTips.shift();
+                        obj.tip = obj.tip.replace($scope.artist.name, "THE ARTIST");
+                        $scope.shownTips.push(obj);
+                        $scope.tips = $scope.shownTips;
+                    });
+                }else{
+                    if($scope.hiddenTips.length > 0){
+                        //display the the remaining tips one by one
+                        var obj = $scope.hiddenTips.shift();
+                        obj.tip = obj.tip.replace($scope.artist.name, "THE ARTIST");
+                        $scope.shownTips.push(obj);
+                        $scope.tips = $scope.shownTips;
+                    }else{
+                        $scope.message = "No tips for this painting left to display!"
+                    }
+                }
+
+            }else{
+                    $scope.message = "You have only " + $scope.points + " point(s) left. You need at least " + JOKER_ARTIST_POINTS + " points for this Joker!";
             }
         }
 
