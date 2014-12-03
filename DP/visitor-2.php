@@ -19,7 +19,6 @@ abstract class Visitor {
 }
 
 class EvaluateVisitor extends Visitor {
-    
     private $stack;
     
     public function __construct() {
