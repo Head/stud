@@ -90,6 +90,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             $scope.artist  = [];
             $scope.disabled_answers = [];
             $scope.hiddenTips = [];
+            $scope.shownTips = [];
             //$scope.loading = true;
             $scope.artist.pic = "https://d13yacurqjgara.cloudfront.net/users/121337/screenshots/916951/small-load.gif";
             $http.post('query.php', {query: queryArtist}).success(fetchRandomArtist);
@@ -368,9 +369,9 @@ angular.module('myApp.AAI', ['ngRoute'])
 
             if($scope.points >= JOKER_ARTIST_POINTS){
                 //Reset points
-                $scope.points -= JOKER_ARTIST_POINTS;
+
                 $scope.showtipps = true;
-                
+
                 //if first call, get the tips
                 if($scope.shownTips.length < 1){
                     var queryArtistTips;
@@ -388,6 +389,7 @@ angular.module('myApp.AAI', ['ngRoute'])
                         obj.tip = obj.tip.replace($scope.artist.name, "THE ARTIST");
                         $scope.shownTips.push(obj);
                         $scope.tips = $scope.shownTips;
+                        $scope.points -= JOKER_ARTIST_POINTS;
                     });
                 }else{
                     if($scope.hiddenTips.length > 0){
@@ -396,6 +398,7 @@ angular.module('myApp.AAI', ['ngRoute'])
                         obj.tip = obj.tip.replace($scope.artist.name, "THE ARTIST");
                         $scope.shownTips.push(obj);
                         $scope.tips = $scope.shownTips;
+                        $scope.points -= JOKER_ARTIST_POINTS;
                     }else{
                         $scope.message = "No tips for this painting left to display!"
                     }
