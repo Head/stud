@@ -1,63 +1,94 @@
-<div class="container row">
+<div class="container">
     <h1>Guess the artist</h1>
-    <div class="col-md-4">
-        <img width="300" class="img-responsive img-rounded" ng-src="{{artist.pic}}"/>
-    </div>
 
-    <div class="col-md-4">
-        <h3>Your answer:</h3>
-        <div class="list-group" ng-hide="correct || loading">
-            <div ng-repeat="answer in answers">
-                <a class="list-group-item {{isAnswerEnabled(answer) ? '' : 'disabled' }}" ng-click="guess(answer)" href="javascript:">
-                    {{answer.name | replaceURI}}
-                    <br ng-show="answer.url"/><img ng-src="{{answer.url}}" width="100" ng-show="answer.url"/>
-                </a>
+    <div ng-hide="started">
+        <form class="col-md-3">
+            <div class="form-group">
+                <label>Age:</label>
+                <select ng-model="userdata.age" ng-init="userdata.age = 25" type="text" class="form-control">
+                    <option ng-repeat="i in ages track by $index" ng-value="$index">{{$index}}</option>
+                </select>
             </div>
-        </div>
-
-        <div ng-show="correct">
-            {{artist.name}} was Correct!
-            <button ng-click="next()"  class="btn btn-success">Next</button>
-        </div>
-
-        <div ng-show="tippPaintArtist">
-            PaintArtist
-        </div>
-        <div ng-show="tippPaintSearch">
-            PaintArtist
-        </div>
-
-
-		<div class="row" ng-show="showSearch">
-			<form ng-submit="search()" >
-				<input tpye="text" class="form-control" ng-model="searchPhrase"/>
-				<input type="button" class="form-control btn btn-default" ng-click="search()" value="suchen"/>
-			</form>
-
-			<ul>
-				<li ng-repeat="res in searchResult">{{res.name}} - {{res.plabel}}</li>
-			</ul>
-		</div>
-
-        <div class="row" ng-show="showtipps">
-            <ul>
-                <li ng-repeat="res in tips">{{res.tip}}</li>
-            </ul>
-        </div>
-
-
+            <div class="form-group">
+                <label>Degree:</label>
+                <select ng-init="userdata.degree = userdata.degree || degrees[1]" ng-model="userdata.degree" ng-options="degree.val for degree in degrees track by degree.key" type="text" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Gender:</label>
+                <select ng-init="userdata.gender = userdata.gender || genders[0]" ng-model="userdata.gender" ng-options="gender.val for gender in genders track by gender.key" type="text" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Art Background:</label>
+                <select ng-init="userdata.art = userdata.art || arts[1]" ng-model="userdata.art" ng-options="art.val for art in arts track by art.key" type="text" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <button ng-click="start()" class="btn btn-success">Start Quiz</button>
+            </div>
+        </form>
     </div>
 
-    <div class="col-md-4">
-        <h4>Total points:</h4>
-        {{points}}
-        <h4>Joker:</h4>
-        <div ng-hide="correct || loading">
-            <input type="button" ng-click="joker5050()" value="50-50"></input>
-            <input type="button" ng-click="jokerArtistsPics()" value="Painting of each artist"></input>
-            <input type="button" ng-click="jokerSearch()" value="Search"></input>
-            <input type="button" ng-click="jokerTextTip()" value="Show tip"></input>
-            <span ng-show="message" style="display:block;background:red;color:#fff;font-weight:bold; padding:5px; border:1px solid #000;"> {{message}} </span>
+    <div ng-show="started">
+        <div class="col-md-4">
+            <img width="300" class="img-responsive img-rounded" ng-src="{{artist.pic}}"/>
+        </div>
+
+        <div class="col-md-3">
+            <h3>Your answer:</h3>
+            <div class="list-group" ng-hide="correct || loading">
+                <div ng-repeat="answer in answers">
+                    <a class="list-group-item {{isAnswerEnabled(answer) ? '' : 'disabled' }}" ng-click="guess(answer)" href="javascript:">
+                        {{answer.name | replaceURI}}
+                        <br ng-show="answer.url"/><img ng-src="{{answer.url}}" width="100" ng-show="answer.url"/>
+                    </a>
+                </div>
+            </div>
+
+            <div ng-show="correct">
+                {{artist.name}} was Correct!
+                <button ng-click="next()"  class="btn btn-success">Next</button>
+            </div>
+
+            <div ng-show="tippPaintArtist">
+                PaintArtist
+            </div>
+            <div ng-show="tippPaintSearch">
+                PaintArtist
+            </div>
+
+        </div>
+
+        <div class="col-md-5">
+            <h3>Total points:</h3>
+            {{points}}
+            <div ng-hide="correct || loading">
+                <h4>Joker:</h4>
+                <input type="button" class="btn btn-default" ng-click="joker5050()" value="50-50"></input>
+                <input type="button" class="btn btn-default" ng-click="jokerArtistsPics()" value="Painting of each artist"></input>
+                <input type="button" class="btn btn-default" ng-click="jokerSearch()" value="Search"></input>
+                <input type="button" class="btn btn-default" ng-click="jokerTextTip()" value="Show tip"></input>
+                <span ng-show="message" style="display:block;background:red;color:#fff;font-weight:bold; padding:5px; border:1px solid #000;"> {{message}} </span>
+
+                <div class="row" ng-show="showSearch">
+                    <form ng-submit="search()" >
+                        <input tpye="text" class="form-control" ng-model="searchPhrase"/>
+                        <input type="button" class="form-control btn btn-default" ng-click="search()" value="suchen"/>
+                    </form>
+
+                    <ul>
+                        <li ng-repeat="res in searchResult">{{res.name}} - {{res.plabel}}</li>
+                    </ul>
+                </div>
+
+                <div class="row" ng-show="showtipps">
+                    <ul>
+                        <li ng-repeat="res in tips">{{res.tip}}</li>
+                    </ul>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

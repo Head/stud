@@ -17,33 +17,51 @@ angular.module('myApp.AAI', ['ngRoute'])
 
     .controller('GTACtrl', ['$scope', '$http', function($scope, $http) {
         // rounds played
-        $scope.round = 0;
+        $scope.round                = 0;
         // total points of player
-        $scope.points = 50;
+        $scope.points               = 50;
 
         // fetch painting count
-        $scope.paintingCounter = 0;
-        $scope.paintingPool = [];
-        $scope.paintingPoolIndex = 0;
+        $scope.paintingCounter      = 0;
+        $scope.paintingPool         = [];
+        $scope.paintingPoolIndex    = 0;
 
-        $scope.disabled_answers = [];
-        $scope.hiddenTips = [];
-        $scope.shownTips = [];
+        $scope.disabled_answers     = [];
+        $scope.hiddenTips           = [];
+        $scope.shownTips            = [];
 
-        // first we count the present paintings
-        var queryCountPaintings = 'SELECT (COUNT(?subject) AS ?count) { ?subject rdf:type yago:Painting103876519 }';
-        $http.post('query.php', {query: queryCountPaintings}).
-            success(function (data, status, headers, config) {
-                // save the amount of paintings in the counter
-                $scope.paintingCounter = parseInt(data[0].count);
-                // create an array with |paintingPool|=paintingCounter and paintingPool[n]=n
-                // later we will pick out randomly the offsets (uniform)
-                for(var i=0;i<$scope.paintingCounter;i++){
-                    $scope.paintingPool.push(i);
-                }
-                // start game with the first call of next()
-                $scope.next();
-            });
+        //User Data
+        $scope.userdata             = {};
+        $scope.ages                 = Array(99);
+        $scope.degrees              = [{key: 'b', 'val': 'Berufsausbildung'}, {key: 'h', 'val': 'Hochschulabschluss'}];
+        $scope.genders              = [{key: 'm', 'val': 'male'}, {key: 'w', 'val': 'female'}];
+        $scope.arts                 = [{key: 'ja', 'val': 'background in arts'}, {key: 'nein', 'val': 'no arts background'}];
+
+        $scope.start = function() {
+            console.log($scope.userdata);
+
+            $http.post('./AAI/start.php', {userdata: $scope.userdata}).
+                success(function () {
+                    $scope.started = true;
+
+
+                    // first we count the present paintings
+                    var queryCountPaintings = 'SELECT (COUNT(?subject) AS ?count) { ?subject rdf:type yago:Painting103876519 }';
+                    $http.post('query.php', {query: queryCountPaintings}).
+                        success(function (data, status, headers, config) {
+                            // save the amount of paintings in the counter
+                            $scope.paintingCounter = parseInt(data[0].count);
+                            // create an array with |paintingPool|=paintingCounter and paintingPool[n]=n
+                            // later we will pick out randomly the offsets (uniform)
+                            for(var i=0;i<$scope.paintingCounter;i++){
+                                $scope.paintingPool.push(i);
+                            }
+                            // start game with the first call of next()
+                            $scope.next();
+                        });
+                });
+        }
+
 
 
         // fetch list of possible artists and paintings
@@ -52,7 +70,7 @@ angular.module('myApp.AAI', ['ngRoute'])
 
 			//reset Search joker
 			$scope.showSearch = $scope.SearchLeft ;
-			$scope.searchResult = "";
+            $scope.showSearch
 
             //restet tip joker
             //$scope.showtipps = false;
@@ -176,10 +194,17 @@ angular.module('myApp.AAI', ['ngRoute'])
 
         $scope.guess = function(answer) {
             if(answer.artist == $scope.artist.artist) {
+                answer.correct=1;
+                $http.post('./AAI/guess.php', {query: answer});
+
                 // inc points and show next option
                 $scope.correct = true;
                 $scope.points += 2;
+
             }else{
+                answer.correct=0;
+                $http.post('./AAI/guess.php', {query: answer});
+
                 // dec points and remove wrong answer
                 $scope.points--;
                 disableAnswer(answer);
