@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__author__ = "Lorenz Liebler"
-__email__ = "info@vxproject.de"
-__status__ = "Production"
 
 import random
 import math
