@@ -7,7 +7,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
-
+import md5
 
 
 
@@ -27,7 +27,7 @@ def clamp(minval,maxval,value):
     return max(minval, min(value, maxval))
 
 # Open file for writing example user data writing
-f = open('query_poll.csv','w')
+f = open('query_poll_md5.csv','w')
 # Write csv header
 f.write("age, gender, art, degree, artisturi, answer \r\n")
 
@@ -64,7 +64,7 @@ for e in range(DUMMY_ARTISTS):
         artist_paints = int(artist_picked[-1])
         artist_influenced = int(artist_picked[-2])
         artist_abstract = int(int("0"+artist_picked[-3])/100)
-
+        
         # Wahrscheinlichkeit die Antwort richtig zu beantworten
         prob = 0
         # prob for age
@@ -98,12 +98,11 @@ for e in range(DUMMY_ARTISTS):
         pkx = (prob_neg, prob)
         custmp = stats.rv_discrete(name='custmp', values=(xp, pkx))
 
-
         # probs = [age, gender, art, degree, artist_uri, prob].join(",")
         # print age, gender, art, degree, artist_uri, prob_age, prob_nerd, prob_deg, artist_paints_prob, artist_inf_prob, artist_abs_prob
         # +str(prob)+"/"+str(prob_neg)+","
         #print str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+str(artist_uri)+","+str(custmp.rvs())
-        f.write(str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+str(artist_uri)+","+str(custmp.rvs())+"\r\n")
+        f.write(str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+md5.new(str(artist_uri)).hexdigest()+","+str(custmp.rvs())+"\r\n")
 
 # Close file for example user data writing
 f.close()
