@@ -27,7 +27,7 @@ def clamp(minval,maxval,value):
     return max(minval, min(value, maxval))
 
 # Open file for writing example user data writing
-f = open('query_poll_md5.csv','w')
+f = open('query_poll.csv','w')
 # Write csv header
 f.write("age, gender, art, degree, artisturi, answer \r\n")
 
@@ -64,23 +64,23 @@ for e in range(DUMMY_ARTISTS):
         artist_paints = int(artist_picked[-1])
         artist_influenced = int(artist_picked[-2])
         artist_abstract = int(int("0"+artist_picked[-3])/100)
-        
+
         # Wahrscheinlichkeit die Antwort richtig zu beantworten
         prob = 0
         # prob for age
         # ältere Leute werden als gebildeter angesehen
-        prob_age = (age/10)
+        prob_age = age/2.
         # prob for art nerd
         if art == "ja":
-            prob_nerd = (age/10)
+            prob_nerd = age/2
         else:
             prob_nerd = 0
         # prob degree
         # muss mindestens 20 Jahre alt sein
         if degree == "h" and age > 20:
-            prob_deg = (age/15)
+            prob_deg = age/4
         else:
-            prob_deg = (age/25)
+            prob_deg = age/7
             degree = "b"
 
         artist_paints_prob = clamp(1,20,artist_paints)
@@ -89,20 +89,27 @@ for e in range(DUMMY_ARTISTS):
 
 
         # break
-        prob = sum([prob_deg, prob_age, prob_nerd, artist_paints_prob, artist_inf_prob, artist_abs_prob])
-        prob = clamp(0, 100, prob+20)/100.
+        prob = prob_deg + prob_age + prob_nerd + artist_paints_prob + artist_inf_prob + artist_abs_prob
+        prob = clamp(0, 100, prob+15)/100.
+        print prob
         prob_neg = 1 - prob
 
         # generate true/false for question
         xp = np.arange(2)
         pkx = (prob_neg, prob)
         custmp = stats.rv_discrete(name='custmp', values=(xp, pkx))
+        #if prob >= 0.5:
+        #    tf = 1
+        #else:
+        #    tf = 0
 
         # probs = [age, gender, art, degree, artist_uri, prob].join(",")
         # print age, gender, art, degree, artist_uri, prob_age, prob_nerd, prob_deg, artist_paints_prob, artist_inf_prob, artist_abs_prob
         # +str(prob)+"/"+str(prob_neg)+","
         #print str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+str(artist_uri)+","+str(custmp.rvs())
-        f.write(str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+md5.new(str(artist_uri)).hexdigest()+","+str(custmp.rvs())+"\r\n")
+        #f.write(str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+md5.new(str(artist_uri)).hexdigest()+","+str(custmp.rvs())+"\r\n")
+        f.write(str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+str(artist_uri)+","+str(custmp.rvs())+"\r\n")
+        #f.write(str(age)+","+str(gender)+","+str(art)+","+str(degree)+","+str(artist_uri)+","+str(tf)+"\r\n")
 
 # Close file for example user data writing
 f.close()
