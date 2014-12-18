@@ -254,7 +254,7 @@ class postOrderIterator extends AritheticIterator {
     }
 }
 
-class polishOrderIterator extends AritheticIterator {
+class preOrderIterator extends AritheticIterator {
 
     private $visitor;
 
@@ -321,7 +321,7 @@ function main() {
 
     echo $print->getResult('in').' = '.$evaluate->getResult('post');
     echo "<hr>";
-    echo "Polish Notation: ".$print->getResult('polish').' = '.$evaluate->getResult('post');
+    echo "Polish Notation: ".$print->getResult('pre').' = '.$evaluate->getResult('post');
 }
 
 //
