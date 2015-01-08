@@ -37,14 +37,19 @@ public class ImageRecognitionTest {
 
 		// image recognition is done here
 		try {
-			//read image
-			BufferedImage image = ImageIO.read(new File(NeuroNetworkBuilder.IMAGE_FILENAME));
+			String path = "/var/www/stud/AAI/imgs/2_portrait/resized";
+			File images [] = new File(path).listFiles();
+			for (int i = (images.length / 2); i < images.length; i++){
 
-			//start recognition
-			HashMap<String, Double> output = imageRecognition.recognizeImage(image);
+				//read image
+				BufferedImage image = ImageIO.read( new File( images[i].getAbsolutePath() ) );
 
-			//show result
-			System.out.println(output.toString());
+				//start recognition
+				HashMap<String, Double> output = imageRecognition.recognizeImage(image);
+
+				//show result
+				System.out.println(output.toString());
+			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
