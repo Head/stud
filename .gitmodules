@@ -7,3 +7,6 @@
 [submodule "alchemyapi_php"]
 	path = alchemyapi_php
 	url = git@github.com:Head/alchemyapi_php.git
+[submodule "bigml-php"]
+	path = bigml-php
+	url = https://github.com/antoniomachine/bigml-php.git
