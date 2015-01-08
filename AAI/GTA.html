@@ -61,6 +61,16 @@
         </div>
 
         <div class="col-md-5">
+            <h3>Your prediction bonus:</h3>
+            <ul>
+                <li>age: {{userdata.age}}</li>
+                <li>gender: {{userdata.gender.val}}</li>
+                <li>degree: {{userdata.degree.val}}</li>
+                <li>art: {{userdata.art.val}}</li>
+                <h4>{{userdata.prediction}}</h4>
+                <h5>{{userdata.confidence}}</h5>
+            </ul>
+            
             <h3>Total points:</h3>
             {{points}}
             <div ng-hide="correct || loading">
