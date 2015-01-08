@@ -1,0 +1,17 @@
+Also damit das Projekt läuft müsst ihr noch ein paar jar-libs runterladen und einbinden:
+
+Download:
+http://sourceforge.net/projects/neuroph/files/neuroph-2.9/neuroph-2.9.zip/download
+
+Entpacken und:
+neuroph-core-2.9.jar
+neuroph-imgrec-2.9.jar
+libs/slf4j-api-1.7.5.jar
+libs/slf4j-nop-1.7.6.jar
+
+dem Buildpath hinzufügen
+
+Dann:
+
+1. Mit dem NeuroNetworkBuilder das neuro-Netz erzeugen
+2. Mit dem ImageRecognitionTest das ganze Testen
