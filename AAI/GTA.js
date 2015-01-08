@@ -43,8 +43,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             $http.post('./AAI/start.php', {userdata: $scope.userdata}).
                 success(function () {
                     $scope.started = true;
-
-
+                    
                     // first we count the present paintings
                     var queryCountPaintings = 'SELECT (COUNT(?subject) AS ?count) { ?subject rdf:type yago:Painting103876519 }';
                     $http.post('query.php', {query: queryCountPaintings}).
@@ -67,7 +66,9 @@ angular.module('myApp.AAI', ['ngRoute'])
         // fetch list of possible artists and paintings
         $scope.next = function() {
             $scope.message = "";
-
+            $scope.userdata.prediction = "Fetching prediction...";
+            $scope.userdata.confidence = "";
+            
 			//reset Search joker
 			$scope.showSearch = $scope.SearchLeft ;
             $scope.showSearch
@@ -75,7 +76,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             //restet tip joker
             //$scope.showtipps = false;
             $scope.tips = "";
-
+            
             // fetch random ID out of the painting pool
             // the choosen id will set the painting by an offset (see query)
             $scope.paintingPoolIndex = Math.floor(Math.random() * $scope.paintingPool.length);
@@ -112,6 +113,7 @@ angular.module('myApp.AAI', ['ngRoute'])
             //$scope.loading = true;
             $scope.artist.pic = "https://d13yacurqjgara.cloudfront.net/users/121337/screenshots/916951/small-load.gif";
             $http.post('query.php', {query: queryArtist}).success(fetchRandomArtist);
+            
         }
 
 
@@ -144,6 +146,36 @@ angular.module('myApp.AAI', ['ngRoute'])
                 var ext = $scope.artist.pic.substr($scope.artist.pic.lastIndexOf('.') + 1);
                 $scope.artist.pic = "AAI/imgs/"+$scope.artist.pic.replace(ext, '').replace(/[^\w\s]/gi, '').replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '')+"_small."+ext;
             }
+
+
+            
+            // Fetch Predition from BigML Model
+            var temppre;
+            console.debug($scope.userdata.age);
+            console.debug($scope.userdata.gender["key"]);
+            console.debug($scope.userdata.degree["key"]);
+            console.debug($scope.userdata.art["key"]);
+            console.debug("###############");
+            console.debug($scope.artist.artist);
+            $http.post('query_prediction.php', {artist: $scope.artist.artist, art: $scope.userdata.art["key"], degree: $scope.userdata.degree["key"], age: $scope.userdata.age, gender: $scope.userdata.gender["key"]}).success(function (data, status, headers, config) {
+                console.debug(data[0]);
+                
+                if(data[0] == "1"){
+                    $scope.userdata.prediction = "Yes - You will answer this question!";
+                    temppre = "Yes";
+                }
+                if(data[0] == "0"){
+                    $scope.userdata.prediction = "No - You will not answer this question!";
+                    temppre = "No";
+                }
+
+                if (parseFloat(data[1])<0.6){
+                    $scope.userdata.prediction = "Hmmm - not sure if you will be right!";
+                }
+                $scope.userdata.confidence = "(Confidence: "+parseFloat(data[1])*100+"% "+temppre+")";
+            });
+
+
 
             // Fetch false answers for the given artist and painting
             // FIXME: queryAnswers = 'SELECT DISTINCT ?artist SAMPLE(?name) ' + fails, empty result

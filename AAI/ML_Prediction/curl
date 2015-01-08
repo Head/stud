@@ -1,0 +1,17 @@
+export BIGML_USERNAME=Hardknox
+export BIGML_API_KEY=1c651c7716b41134337a8559949f31f3b8ff7cb1
+export BIGML_AUTH="username=$BIGML_USERNAME;api_key=$BIGML_API_KEY"
+
+
+curl https://bigml.io/dev/model/548ee909568be57ad90006de?$BIGML_AUTH
+
+
+curl https://bigml.io/andromeda/model?$BIGML_AUTH 
+curl https://bigml.io/dev/model?$BIGML_AUTH 
+
+
+
+curl 'https://bigml.io/dev/prediction?username=Hardknox;api_key=1c651c7716b41134337a8559949f31f3b8ff7cb1' \
+-X POST \
+-H 'content-type: application/json' \
+-d '{"model": "model/548ee909568be57ad90006de", "input_data": {"000000": "42","000001": "m","000002": "nein","000003": "b","000004": "http://dbpedia.org/resource/Albert_Bierstadt"}}' 
