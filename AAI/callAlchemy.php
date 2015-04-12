@@ -80,8 +80,6 @@ $result='{	"@text":"blah picture description blah",
 /*
 	runAllRequestsAndSaveThemToFile()
 	http://access.alchemyapi.com/calls/text/TextGetRelations?apikey=YOUR_API_KEY&outputMode=rdf&sentiment=1&entities=1&text=Ugly%20Bob%20attacked%20beautiful%20Susan
-	a0130930b8e8ee2c46e9d31e8ec69170266ea7c7
-	af69a9d467fce3151089697910d001bda0cbad09
 	does all the stuff and writes it to file
 */
 function runAllRequestsAndSaveThemToFile($filename){
@@ -100,7 +98,7 @@ function runAllRequestsAndSaveThemToFile($filename){
 		//	break;
 		//}
 
-		$result = singleRequest('http://access.alchemyapi.com/calls/text/TextGetRelations?apikey=af69a9d467fce3151089697910d001bda0cbad09&outputMode=json&sentiment=1&entities=1&text=' . urlencode($p['descr']));
+		$result = singleRequest('http://access.alchemyapi.com/calls/text/TextGetRelations?apikey=APIKEYTOINSERT&outputMode=json&sentiment=1&entities=1&text=' . urlencode($p['descr']));
 
 		$json_output = json_decode($result, TRUE);
 
